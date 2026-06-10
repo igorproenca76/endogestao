@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EndoGestão — Igor Mendonça Proença</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&display=swap');
+
+:root {
+  --bg: #f9f8f5;
+  --bg2: #ffffff;
+  --bg3: #f2f0ec;
+  --border: #e5e2db;
+  --border2: #d0ccC4;
+  --text: #1c1a17;
+  --text2: #5c594f;
+  --text3: #a09c92;
+  --accent: #8c6820;
+  --accent2: #3d7a5e;
+  --warn: #a04f18;
+  --danger: #9e2a2a;
+  --success: #2a6e47;
+  --h9j: #2060a0;
+  --nipo: #2a6e47;
+  --analia: #8c6820;
+  --alpha: #7a2e8a;
+  --morumbi: #a04f18;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Mono', monospace;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+  min-height: 100vh;
+}
+
+/* NAV */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  display: flex; align-items: center; gap: 0;
+}
+.nav-brand {
+  font-family: 'Fraunces', serif;
+  font-size: 15px; font-weight: 600;
+  color: var(--accent);
+  padding: 14px 20px 14px 0;
+  border-right: 1px solid var(--border);
+  margin-right: 8px;
+  white-space: nowrap;
+}
+.nav-btn {
+  padding: 14px 14px;
+  background: none; border: none;
+  color: var(--text2); cursor: pointer;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px; letter-spacing: 0.03em;
+  border-bottom: 2px solid transparent;
+  transition: all .15s; white-space: nowrap;
+}
+.nav-btn:hover { color: var(--text); }
+.nav-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* LAYOUT */
+.screen { display: none; padding: 28px 24px; }
+.screen.active { display: block; }
+
+/* CARDS */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 18px 20px;
+  margin-bottom: 14px;
+}
+.card-title {
+  font-family: 'Fraunces', serif;
+  font-size: 12px; font-weight: 300;
+  color: var(--text2);
+  text-transform: uppercase; letter-spacing: 0.12em;
+  margin-bottom: 14px;
+}
+
+/* METRICS */
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px; margin-bottom: 20px;
+}
+.metric {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 16px 18px;
+}
+.metric-label { font-size: 10px; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+.metric-value { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 600; color: var(--text); }
+.metric-sub { font-size: 10px; color: var(--text3); margin-top: 4px; }
+
+/* TABLES */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th {
+  text-align: left; font-size: 10px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--text3);
+  padding: 8px 10px; border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+td { padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr.ap-row { background: rgba(201, 125, 78, 0.06); }
+tr:hover td { background: rgba(0,0,0,0.02); }
+
+/* BADGES */
+.badge {
+  display: inline-block; font-size: 10px; letter-spacing: 0.05em;
+  padding: 2px 8px; border-radius: 3px; font-family: 'DM Mono', monospace;
+}
+.b-green { background: rgba(42,110,71,0.1); color: var(--success); border: 1px solid rgba(42,110,71,0.3); }
+.b-amber { background: rgba(140,104,32,0.1); color: var(--accent); border: 1px solid rgba(140,104,32,0.25); }
+.b-red { background: rgba(158,42,42,0.1); color: var(--danger); border: 1px solid rgba(201,110,110,0.3); }
+.b-gray { background: rgba(80,76,70,0.08); color: var(--text2); border: 1px solid var(--border2); }
+.b-warn { background: rgba(160,79,24,0.1); color: var(--warn); border: 1px solid rgba(160,79,24,0.25); }
+.b-ap { background: rgba(160,79,24,0.12); color: var(--warn); border: 1px solid rgba(160,79,24,0.4); font-weight: 500; }
+
+/* FORMS */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+.form-grid.full { grid-template-columns: 1fr; }
+.form-field label { display: block; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-bottom: 5px; }
+.form-field input, .form-field select, .form-field textarea {
+  width: 100%; background: var(--bg3); border: 1px solid var(--border2);
+  color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px;
+  padding: 8px 10px; border-radius: 4px; outline: none;
+}
+.form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: var(--accent); }
+.form-field textarea { resize: vertical; min-height: 56px; }
+.form-field .hint { font-size: 10px; color: var(--text3); margin-top: 4px; }
+.form-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
+
+/* BUTTONS */
+.btn {
+  padding: 8px 16px; border-radius: 4px; cursor: pointer;
+  font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500;
+  border: 1px solid var(--border2); background: transparent; color: var(--text2);
+  transition: all .15s; white-space: nowrap;
+}
+.btn:hover { color: var(--text); border-color: var(--text3); }
+.btn-primary { background: rgba(140,104,32,0.1); color: var(--accent); border-color: rgba(140,104,32,0.35); }
+.btn-primary:hover { background: rgba(140,104,32,0.18); }
+.btn-danger { color: var(--danger); border-color: rgba(201,110,110,0.3); }
+.btn-danger:hover { background: rgba(158,42,42,0.08); }
+.btn-success { background: rgba(42,110,71,0.1); color: var(--success); border-color: rgba(42,110,71,0.35); }
+.btn-sm { padding: 4px 10px; font-size: 11px; }
+.btn-ap { background: rgba(160,79,24,0.12); color: var(--warn); border-color: rgba(160,79,24,0.4); }
+
+/* SECTION HEADER */
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 8px; }
+.section-header h2 { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 300; color: var(--text); }
+
+/* FILTER ROW */
+.filter-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+.filter-row select, .filter-row input {
+  background: var(--bg3); border: 1px solid var(--border2);
+  color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px;
+  padding: 6px 10px; border-radius: 4px; outline: none; width: auto;
+}
+
+/* SERVICE DOT */
+.svc-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: middle; flex-shrink: 0; }
+
+/* MINI BAR */
+.mini-bar { height: 4px; border-radius: 2px; background: var(--border); margin-top: 6px; overflow: hidden; }
+.mini-bar-fill { height: 100%; border-radius: 2px; }
+
+/* TAG */
+.tag { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 3px; margin: 1px; background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
+
+/* CALC BOX */
+.calc-box { background: var(--bg3); border: 1px solid var(--border2); border-radius: 4px; padding: 12px 14px; margin-bottom: 12px; font-size: 12px; }
+.calc-row { display: flex; justify-content: space-between; padding: 2px 0; color: var(--text2); }
+.calc-row.total { color: var(--success); font-size: 13px; border-top: 1px solid var(--border); margin-top: 6px; padding-top: 6px; }
+.calc-row .neg { color: var(--danger); }
+
+/* EMPTY */
+.empty { text-align: center; padding: 40px 20px; color: var(--text3); font-size: 12px; }
+
+/* AP ALERT */
+.ap-alert { background: rgba(160,79,24,0.08); border: 1px solid rgba(160,79,24,0.25); border-radius: 6px; padding: 14px 16px; margin-bottom: 14px; }
+.ap-alert-title { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--warn); margin-bottom: 10px; }
+
+/* GRID 2 */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+
+/* CHIP */
+.chip { font-size: 10px; padding: 2px 7px; border-radius: 10px; border: 1px solid var(--border2); color: var(--text3); }
+
+/* GLOSA */
+.glosa-row { background: rgba(158,42,42,0.04); }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">EndoGestão</div>
+  <button class="nav-btn active" onclick="showScreen('dashboard',this)">Painel</button>
+  <button class="nav-btn" onclick="showScreen('agenda',this)">Agenda</button>
+  <button class="nav-btn" onclick="showScreen('pacientes',this)">Pacientes</button>
+  <button class="nav-btn" onclick="showScreen('financeiro',this)">Financeiro</button>
+  <button class="nav-btn" onclick="showScreen('servicos',this)">Serviços</button>
+</nav>
+
+<!-- DASHBOARD -->
+<div id="screen-dashboard" class="screen active">
+  <div class="metrics" id="dash-metrics"></div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">Produção líquida por serviço — mês atual</div>
+      <div id="dash-bars"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Previsão de recebimentos</div>
+      <div id="dash-prev"></div>
+    </div>
+  </div>
+  <div id="dash-ap-section"></div>
+  <div class="card">
+    <div class="card-title">Resumo mensal — líquido final</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Mês</th><th>H9J</th><th>NIPO</th><th>SL Anália</th><th>SL Alpha</th><th>SL Morumbi</th><th>Total</th></tr></thead>
+        <tbody id="tbody-resumo"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- AGENDA -->
+<div id="screen-agenda" class="screen">
+  <div class="section-header">
+    <h2>Agenda</h2>
+    <button class="btn btn-primary" onclick="showForm('form-agenda')">+ Nova agenda</button>
+  </div>
+  <div id="form-agenda" style="display:none">
+    <div class="card">
+      <div class="card-title">Registrar agenda / produção</div>
+      <div class="form-grid">
+        <div class="form-field"><label>Serviço</label><select id="ag-hosp" onchange="renderAgCampos()"><option value="">— selecione —</option></select></div>
+        <div class="form-field"><label>Data</label><input type="date" id="ag-data"></div>
+      </div>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Períodos realizados</label>
+          <input type="number" id="ag-periodos" min="0" step="1" placeholder="1 ou 2">
+          <div class="hint" id="ag-hint-periodos"></div>
+        </div>
+        <div class="form-field">
+          <label>Bruto do serviço / NF (R$)</label>
+          <input type="number" id="ag-bruto" step="0.01" placeholder="Calculado auto se tabelado" oninput="calcAgAuto()">
+        </div>
+      </div>
+      <div id="ag-campos-proc"></div>
+      <div id="ag-calc" style="display:none" class="calc-box"></div>
+      <div class="form-grid full">
+        <div class="form-field"><label>Observações</label><input type="text" id="ag-obs" placeholder="Notas da agenda..."></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn" onclick="hideForm('form-agenda')">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveAgenda()">Salvar</button>
+      </div>
+    </div>
+  </div>
+  <div class="filter-row">
+    <select id="f-ag-hosp" onchange="renderAgenda()"><option value="">Todos os serviços</option></select>
+    <select id="f-ag-mes" onchange="renderAgenda()"><option value="">Todos os meses</option></select>
+  </div>
+  <div id="agenda-content"></div>
+</div>
+
+<!-- PACIENTES -->
+<div id="screen-pacientes" class="screen">
+  <div class="section-header">
+    <h2>Pacientes</h2>
+    <div style="display:flex;gap:8px;align-items:center">
+      <select id="export-mes" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:'DM Mono',monospace;font-size:12px;padding:6px 10px;border-radius:4px;outline:none"></select>
+      <button class="btn" onclick="exportExcel()" style="white-space:nowrap">↓ Exportar Excel</button>
+      <button class="btn btn-primary" onclick="showForm('form-pac')">+ Novo paciente</button>
+    </div>
+  </div>
+  <div id="form-pac" style="display:none">
+    <div class="card">
+      <div class="card-title">Cadastrar paciente</div>
+      <div class="form-grid">
+        <div class="form-field"><label>Nome completo</label><input type="text" id="pac-nome"></div>
+        <div class="form-field"><label>Data de nascimento</label><input type="date" id="pac-nasc"></div>
+      </div>
+      <div class="form-grid">
+        <div class="form-field"><label>Convênio</label><input type="text" id="pac-conv" placeholder="Ex: Bradesco, Sul América"></div>
+        <div class="form-field"><label>Serviço / local</label><select id="pac-hosp"><option value="">— selecione —</option></select></div>
+      </div>
+      <div class="form-grid">
+        <div class="form-field"><label>Data do atendimento</label><input type="date" id="pac-data"></div>
+        <div class="form-field"><label>Procedimento</label><input type="text" id="pac-proc" placeholder="Ex: EDA + CLN + P"></div>
+      </div>
+      <div class="form-grid full">
+        <div class="form-field"><label>Achados / observações clínicas</label><textarea id="pac-hist" placeholder="Achados relevantes, conduta..."></textarea></div>
+      </div>
+      <div style="display:flex;gap:20px;margin-bottom:12px;flex-wrap:wrap">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px">
+          <input type="checkbox" id="pac-ap" style="width:auto;accent-color:var(--warn)">
+          <span style="color:var(--warn);font-weight:500">Aguarda AP</span>
+          <span style="color:var(--text3);font-size:10px">(anatomopatológico — AP sublinhado na folha)</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px">
+          <input type="checkbox" id="pac-interesse" style="width:auto;accent-color:var(--accent)">
+          <span>Outro achado de interesse</span>
+        </label>
+      </div>
+      <div class="form-actions">
+        <button class="btn" onclick="hideForm('form-pac')">Cancelar</button>
+        <button class="btn btn-primary" onclick="savePac()">Salvar paciente</button>
+      </div>
+    </div>
+  </div>
+  <div class="filter-row">
+    <input type="text" id="f-pac-nome" placeholder="Buscar nome..." oninput="renderPac()" style="width:200px">
+    <select id="f-pac-hosp" onchange="renderPac()"><option value="">Todos os serviços</option></select>
+    <select id="f-pac-fil" onchange="renderPac()">
+      <option value="">Todos</option>
+      <option value="ap">Aguarda AP</option>
+      <option value="interesse">Achados de interesse</option>
+    </select>
+    <select id="f-pac-mes" onchange="renderPac()"><option value="">Todos os meses</option></select>
+  </div>
+  <div class="card" style="padding:0">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Nome</th><th>Atend.</th><th>Serviço</th><th>Convênio</th><th>Procedimento</th><th>Achados</th><th>Status</th><th></th></tr></thead>
+        <tbody id="tbody-pac"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- FINANCEIRO -->
+<div id="screen-financeiro" class="screen">
+  <div class="section-header">
+    <h2>Financeiro</h2>
+    <button class="btn btn-primary" onclick="showForm('form-pgto')">+ Registrar pagamento</button>
+  </div>
+  <div id="form-pgto" style="display:none">
+    <div class="card">
+      <div class="card-title">Registrar pagamento recebido</div>
+      <div class="form-grid">
+        <div class="form-field"><label>Serviço</label><select id="pg-hosp" onchange="calcPgtoPreview()"><option value="">— selecione —</option></select></div>
+        <div class="form-field"><label>Competência (mês do serviço)</label><input type="month" id="pg-comp"></div>
+      </div>
+      <div class="form-grid">
+        <div class="form-field"><label>Data do recebimento</label><input type="date" id="pg-data"></div>
+        <div class="form-field"><label>Bruto da NF emitida (R$)</label><input type="number" id="pg-bruto" step="0.01" placeholder="0,00" oninput="calcPgtoPreview()"></div>
+      </div>
+      <div id="pgto-calc" style="display:none" class="calc-box"></div>
+      <div class="form-grid">
+        <div class="form-field"><label>Glosa / desconto retroativo (R$)</label><input type="number" id="pg-glosa" step="0.01" placeholder="0,00" oninput="calcPgtoPreview()"><div class="hint">Valor negativo que o hospital descontou de competências anteriores</div></div>
+        <div class="form-field"><label>Referência / NF</label><input type="text" id="pg-obs" placeholder="Ex: Repasse 90373, NF 1234"></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn" onclick="hideForm('form-pgto')">Cancelar</button>
+        <button class="btn btn-primary" onclick="savePgto()">Salvar pagamento</button>
+      </div>
+    </div>
+  </div>
+  <div class="metrics" id="fin-metrics"></div>
+  <div class="card" style="padding:0">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Comp.</th><th>Serviço</th><th>Bruto NF</th><th>COFINS</th><th>PIS</th><th>CSL</th><th>IRRF</th><th>Glosa</th><th>Líq. final</th><th>Data pgto</th><th>Prev.</th><th>Status</th><th></th></tr></thead>
+        <tbody id="tbody-fin"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- SERVIÇOS -->
+<div id="screen-servicos" class="screen">
+  <div class="section-header"><h2>Serviços</h2></div>
+  <div id="lista-servicos"></div>
+</div>
+
+<script>
+const KEY = 'endogestao_v1';
+const CORES = { h9j: '#6e9bc8', nipo: '#7ab394', sl_analia: '#c8a96e', sl_alpha: '#b87ab3', sl_morumbi: '#c97d4e' };
+
+// Tributação PJ
+const TX = { cofins: 0.03, pis: 0.0065, csl: 0.01, irrf: 0.015 };
+const TX_EFETIVO = 0.0793;
+
+function calcTributos(bruto, nf) {
+  if (!nf) return { cofins:0, pis:0, csl:0, irrf:0, totalTx:0, liquido:bruto };
+  return {
+    cofins: r2(bruto * TX.cofins), pis: r2(bruto * TX.pis),
+    csl: r2(bruto * TX.csl), irrf: r2(bruto * TX.irrf),
+    totalTx: r2(bruto * TX_EFETIVO), liquido: r2(bruto * (1 - TX_EFETIVO))
+  };
+}
+
+// Configuração dos serviços — calibrada após treinamento
+const SERVICOS_CONFIG = [
+  {
+    id: 'h9j', nome: 'H9J', cor: CORES.h9j, delay: 1, nf: true,
+    periodoNoValor: true,
+    tabela: { periodo: 1000, sobreaviso: 600, polipectomia: 100, terapeutica: 200, eco: 1200, ecoPunc: 1500, cpre: 1500, meioEco: 600, meioEcoPunc: 750 },
+    campos: ['periodo','sobreaviso','polipectomia','terapeutica','eco','ecoPunc','cpre','meioEco','meioEcoPunc'],
+    obs: 'Período + produção tabelada. Delay: 1 mês. NF PJ. Fechamento: PDF por paciente.'
+  },
+  {
+    id: 'nipo', nome: 'NIPO', cor: CORES.nipo, delay: 2, nf: true,
+    periodoNoValor: false, repasse_pct: 0.70,
+    tabela: {},
+    campos: ['eda','cln','pxA','pxB','mucose','cpre1','cpre2','eco','hemostasia','dilatacao','sne'],
+    obs: 'Produção variável por convênio. Repasse = 70% do bruto (hospital retém 30%). Delay: 2 meses. Fechamento: PDF relatório + recibo com tributos discriminados.'
+  },
+  {
+    id: 'sl_analia', nome: 'SL Anália', cor: CORES.sl_analia, delay: 3, nf: true,
+    periodoNoValor: false,
+    tabela: { edaDiag: 110, edaTer: 185, clnDiag: 210, clnTer: 290, cpre: 550, eco: 500, ecoPunc: 600, sobreaviso: 250 },
+    campos: ['edaDiag','edaTer','clnDiag','clnTer','cpre','eco','ecoPunc','sobreaviso'],
+    obs: 'Especialidade: ECO. Tabelado por tipo (Diagnóstica/Terapêutica). Delay: 3 meses. Fechamento: tabela Excel com contagem por tipo. Folha de agenda separada (mesmo formato NIPO/Morumbi).'
+  },
+  {
+    id: 'sl_alpha', nome: 'SL Alpha', cor: CORES.sl_alpha, delay: 2, nf: false,
+    periodoNoValor: true,
+    desconto_inicio: '2026-04', desconto_atual: 0.15, desconto_antigo: 0.20,
+    tabela: { periodo: 1400, sobreaviso: 500, poliA: 62.5, poliB: 122.25, mucose: 310.5, hemEsof: 112.5, hemColon: 185, injecao: 112.5, retosig: 137.5, sne: 112.5, gttPrinc: 450, gttAux: 230, corpoEst: 112.5, eco: 750, ecoPunc: 900, cpreSprot: 905, creCprot: 1090 },
+    campos: ['periodo','sobreaviso','poliA','poliB','mucose','hemEsof','hemColon','injecao','eco','ecoPunc','cpreSprot','creCprot'],
+    obs: 'Sócio minoritário — recebe já líquido, sem NF adicional. Desconto: 15% a partir abr/26 (era 20%). Delay: 2 meses. Fechamento: Excel produtividade.'
+  },
+  {
+    id: 'sl_morumbi', nome: 'SL Morumbi', cor: CORES.sl_morumbi, delay: 2, nf: true,
+    periodoNoValor: false,
+    tabela: {},
+    campos: ['eda','cln','pa','pb','mucose','hemostasia','anRts','sne','dilatacao'],
+    obs: 'Produção variável por convênio. Delay: 2 meses. Fechamento: tabela com bruto/impostos + relação de pacientes.'
+  }
+];
+
+const LABELS = {
+  periodo:'Período/dia', sobreaviso:'Sobreaviso', polipectomia:'Polipectomia', terapeutica:'Outras terapêuticas',
+  eco:'ECO', ecoPunc:'ECO + Punção', cpre:'CPRE', meioEco:'½ ECO', meioEcoPunc:'½ ECO Punção',
+  eda:'EDA', cln:'CLN', pxA:'Px Alta', pxB:'Px Baixa', mucose:'Mucosectomia',
+  cpre1:'CPRE 1', cpre2:'CPRE 2', hemostasia:'Hemostasia', dilatacao:'Dilatação', sne:'SNE/CE/GTT',
+  edaDiag:'EDA Diagnóstica', edaTer:'EDA Terapêutica', clnDiag:'CLN Diagnóstica', clnTer:'CLN Terapêutica',
+  poliA:'Polip. Alta', poliB:'Polip. Baixa', hemEsof:'Hemostasia esof.', hemColon:'Hemostasia cólon',
+  injecao:'Injeção', retosig:'Retossigmoide', gttPrinc:'GTT principal', gttAux:'GTT auxiliar',
+  corpoEst:'Corpo estranho', cpreSprot:'CPRE s/ prótese', creCprot:'CPRE c/ prótese',
+  pa:'Px Alta', pb:'Px Baixa', anRts:'AN/RTS'
+};
+
+function r2(v) { return Math.round(v * 100) / 100; }
+function fmtV(v) { return 'R$ ' + (v||0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function fmtM(ym) {
+  if (!ym) return '—';
+  const [y, m] = ym.split('-');
+  return ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'][parseInt(m)-1] + '/' + y.slice(2);
+}
+function fmtD(d) { return d ? new Date(d + 'T12:00').toLocaleDateString('pt-BR') : '—'; }
+function prevPgto(comp, delay) {
+  const [y, m] = comp.split('-').map(Number);
+  const d = new Date(y, m - 1 + delay, 1);
+  return d.getFullYear() + '-' + (d.getMonth() + 1).toString().padStart(2, '0');
+}
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 5); }
+function svcById(id) { return db.servicos.find(s => s.id === id) || { nome: id, cor: '#888', tabela: {}, campos: [], delay: 2, nf: false }; }
+
+function calcBrutoTabela(s, periodos, proc, comp) {
+  if (!Object.keys(s.tabela).length) return 0;
+  let b = 0;
+  if (s.periodoNoValor && s.tabela.periodo) b += periodos * s.tabela.periodo;
+  Object.entries(proc).forEach(([k, v]) => { if (k !== 'periodo' && s.tabela[k]) b += v * s.tabela[k]; });
+  if (s.id === 'sl_alpha') {
+    const desc = comp >= (s.desconto_inicio || '9999') ? s.desconto_atual : s.desconto_antigo;
+    b = b * (1 - desc);
+  }
+  return r2(b);
+}
+
+function initDb() {
+  try { const s = localStorage.getItem(KEY); if (s) return JSON.parse(s); } catch(e) {}
+  // Dados junho/2026 — validados com Igor em 08/06/2026
+  return {
+    servicos: SERVICOS_CONFIG,
+    agenda: [
+      // 02/06/2026 — SL Morumbi — 2 períodos
+      {id:'ag_m0602', hospId:'sl_morumbi', comp:'2026-06', data:'2026-06-02',
+       periodos:2, brutoServico:0, liqFinal:0,
+       proc:{eda:9, cln:6, pa:5, pb:1, mucose:1},
+       obs:'9 pac · AP pendente: Camila, Edson'},
+      // 03/06/2026 — NIPO — 2 períodos
+      {id:'ag_n0603', hospId:'nipo', comp:'2026-06', data:'2026-06-03',
+       periodos:2, brutoServico:0, liqFinal:0,
+       proc:{eda:10, cln:4, pxA:3, pxB:1, cpre1:1, sne:1},
+       obs:'13 pac · CE: 1 · AP pendente: Fladimir, Michele'},
+      // 08/06/2026 — SL Alpha — 1 período
+      {id:'ag_al0608', hospId:'sl_alpha', comp:'2026-06', data:'2026-06-08',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{eda:3, cln:2, eco:2, poliB:2},
+       obs:'4 pac · AP pendente: Rosemary'},
+      // 09/06/2026 — SL Morumbi — 2 períodos
+      {id:'ag_m0609', hospId:'sl_morumbi', comp:'2026-06', data:'2026-06-09',
+       periodos:2, brutoServico:0, liqFinal:0,
+       proc:{eda:7, cln:6, pa:4, pb:2},
+       obs:'8 pac · AP pendente: Paulo Hardt'},
+    ],
+    pacientes: [
+      // ---- SL MORUMBI 02/06/2026 ----
+      {id:'p_m01',nome:'Lale Penariol Camara de Oliveira',nasc:'2009-08-20',conv:'Mediservice',hospId:'sl_morumbi',dataAtend:'2026-06-02',proc:'EDA + CLN',hist:'',ap:false,interesse:false},
+      {id:'p_m02',nome:'Luigi Ammar Dorta',nasc:'2016-07-07',conv:'Bradesco',hospId:'sl_morumbi',dataAtend:'2026-06-02',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_m03',nome:'Adriana Castro da Silva',nasc:'1974-05-18',conv:'Sul América',hospId:'sl_morumbi',dataAtend:'2026-06-02',proc:'EDA + CLN + PA + PB',hist:'',ap:false,interesse:false},
+      {id:'p_m04',nome:'Vandreio Ferreira',nasc:'1971-03-05',conv:'Bradesco',hospId:'sl_morumbi',dataAtend:'2026-06-02',proc:'EDA + CLN + PA',hist:'',ap:false,interesse:false},
+      {id:'p_m05',nome:'Camila Gomes Monteiro',nasc:'1991-12-25',conv:'Bradesco',hospId:'sl_morumbi',dataAtend:'2026-06-02',proc:'EDA + CLN + PA',hist:'',ap:true,interesse:false},
+      {id:'p_m06',nome:'Edson Duarte Jardim',nasc:'1963-02-23',conv:'Bradesco Operador',hospId:'sl_morumbi',dataAtend:'2026-06-02',proc:'EDA + CLN + PA + M',hist:'',ap:true,interesse:false},
+      {id:'p_m07',nome:'Lara Souza Godoi',nasc:'2012-08-13',conv:'Sul América',hospId:'sl_morumbi',dataAtend:'2026-06-02',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_m08',nome:'Suzana Guimaraes de Carvalho Perez',nasc:'1979-04-01',conv:'Bradesco',hospId:'sl_morumbi',dataAtend:'2026-06-02',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_m09',nome:'Ana Claudia Weeden Martins',nasc:'1973-07-02',conv:'Bradesco',hospId:'sl_morumbi',dataAtend:'2026-06-02',proc:'EDA + CLN + PA',hist:'',ap:false,interesse:false},
+      // ---- NIPO 03/06/2026 ----
+      {id:'p_n01',nome:'Patricia Dourado Gomes',nasc:'1985-03-07',conv:'Postal Saúde',hospId:'nipo',dataAtend:'2026-06-03',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n02',nome:'Janaina de Sousa Severiano',nasc:'1987-09-30',conv:'Postal Saúde',hospId:'nipo',dataAtend:'2026-06-03',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_n03',nome:'Aline Rodrigues Bento Dantas',nasc:'1995-07-10',conv:'Bradesco',hospId:'nipo',dataAtend:'2026-06-03',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n04',nome:'Diego Luis Pedroso',nasc:'1987-08-23',conv:'Sul América',hospId:'nipo',dataAtend:'2026-06-03',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_n05',nome:'Ariele dos Santos Xavier',nasc:'1998-12-24',conv:'Bradesco',hospId:'nipo',dataAtend:'2026-06-03',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_n06',nome:'Vinícius Vicente Gara',nasc:'1995-11-21',conv:'Sul América',hospId:'nipo',dataAtend:'2026-06-03',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n07',nome:'Aline Florencio da Silva',nasc:'2002-05-21',conv:'Porto Saúde',hospId:'nipo',dataAtend:'2026-06-03',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n08',nome:'Joicilene Cristina da Silva',nasc:'1982-02-12',conv:'Porto Saúde',hospId:'nipo',dataAtend:'2026-06-03',proc:'CLN + PB',hist:'',ap:false,interesse:false},
+      {id:'p_n09',nome:'Fladimir Januario da Silva',nasc:'1978-02-12',conv:'Bradesco',hospId:'nipo',dataAtend:'2026-06-03',proc:'EDA + CLN',hist:'',ap:true,interesse:false},
+      {id:'p_n10',nome:'Sonia Maria Kominich Martins',nasc:'1956-04-21',conv:'Saúde Caixa',hospId:'nipo',dataAtend:'2026-06-03',proc:'CLN',hist:'',ap:false,interesse:false},
+      {id:'p_n11',nome:'Michele Martins dos Reis',nasc:'1985-12-22',conv:'Bradesco',hospId:'nipo',dataAtend:'2026-06-03',proc:'EDA + CLN',hist:'',ap:true,interesse:false},
+      {id:'p_n12',nome:'Beatriz Lima Oliveira',nasc:'1993-08-12',conv:'Bradesco',hospId:'nipo',dataAtend:'2026-06-03',proc:'CPRE',hist:'Coledocolitíase',ap:false,interesse:false},
+      {id:'p_n13',nome:'Maria Aparecida Moreira',nasc:'',conv:'',hospId:'nipo',dataAtend:'2026-06-03',proc:'EDA + CE',hist:'Corpo estranho',ap:false,interesse:false},
+      // ---- SL ALPHA 08/06/2026 ----
+      {id:'p_al01',nome:'Abigail Santos da Silva Oliveira',nasc:'1965-04-18',conv:'Metrus',hospId:'sl_alpha',dataAtend:'2026-06-08',proc:'EDA + CLN + PB',hist:'',ap:false,interesse:false},
+      {id:'p_al02',nome:'Ana Claudia de Albuquerque',nasc:'1974-12-17',conv:'Bradesco',hospId:'sl_alpha',dataAtend:'2026-06-08',proc:'ECO',hist:'',ap:false,interesse:false},
+      {id:'p_al03',nome:'Isabele Dantas Sousa',nasc:'2006-09-01',conv:'Sul América',hospId:'sl_alpha',dataAtend:'2026-06-08',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_al04',nome:'Rosemary dos Santos Silva Oliveira',nasc:'1983-05-19',conv:'Bradesco',hospId:'sl_alpha',dataAtend:'2026-06-08',proc:'EDA + ECO + CLN + PB',hist:'',ap:true,interesse:false},
+      // ---- SL MORUMBI 09/06/2026 ----
+      {id:'p_m09_01',nome:'Shioi Sunada',nasc:'1978-10-04',conv:'Bradesco',hospId:'sl_morumbi',dataAtend:'2026-06-09',proc:'CLN',hist:'',ap:false,interesse:false},
+      {id:'p_m09_02',nome:'Hellen Soares de Sa',nasc:'1980-10-24',conv:'Bradesco',hospId:'sl_morumbi',dataAtend:'2026-06-09',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_m09_03',nome:'Roberta Miranda Cattermol da Rocha Ferreira',nasc:'1984-11-24',conv:'Bradesco',hospId:'sl_morumbi',dataAtend:'2026-06-09',proc:'EDA + PA + CLN',hist:'',ap:false,interesse:false},
+      {id:'p_m09_04',nome:'Marcio Pepino',nasc:'1959-01-02',conv:'Sul América',hospId:'sl_morumbi',dataAtend:'2026-06-09',proc:'EDA + PA + CLN',hist:'',ap:false,interesse:false},
+      {id:'p_m09_05',nome:'Felipe Augusto Ferreira Souza',nasc:'1985-04-13',conv:'Bradesco',hospId:'sl_morumbi',dataAtend:'2026-06-09',proc:'EDA + CLN',hist:'',ap:false,interesse:false},
+      {id:'p_m09_06',nome:'Paulo Hardt Constanzo',nasc:'1979-01-28',conv:'Sul América',hospId:'sl_morumbi',dataAtend:'2026-06-09',proc:'EDA + PA + CLN + PB',hist:'',ap:true,interesse:false},
+      {id:'p_m09_07',nome:'Jose Carlos Albuquerque Marques',nasc:'1970-02-25',conv:'Bradesco',hospId:'sl_morumbi',dataAtend:'2026-06-09',proc:'EDA + CLN + PB',hist:'',ap:false,interesse:false},
+      {id:'p_m09_08',nome:'Lygia Lacerda Cavalcanti de Lima',nasc:'1984-06-03',conv:'Sul América',hospId:'sl_morumbi',dataAtend:'2026-06-09',proc:'EDA',hist:'',ap:false,interesse:false},
+    ],
+    pagamentos: []
+  };
+}
+
+let db = initDb();
+function saveDb() { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch(e) {} }
+
+function showScreen(id, btn) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  renderAll();
+}
+function showForm(id) { document.getElementById(id).style.display = 'block'; window.scrollTo(0,0); }
+function hideForm(id) { document.getElementById(id).style.display = 'none'; }
+function populateSel(selId) {
+  const sel = document.getElementById(selId); if (!sel) return;
+  const cur = sel.value;
+  while (sel.options.length > 1) sel.remove(1);
+  db.servicos.forEach(s => sel.add(new Option(s.nome, s.id)));
+  if (cur) sel.value = cur;
+}
+
+// ---- AGENDA / PRODUÇÃO ----
+function renderAgCampos() {
+  const sid = document.getElementById('ag-hosp').value;
+  if (!sid) { document.getElementById('ag-campos-proc').innerHTML = ''; return; }
+  const s = svcById(sid);
+  document.getElementById('ag-hint-periodos').textContent = s.periodoNoValor ? 'Entra no valor calculado' : 'Só controle de produtividade';
+  const campos = s.campos.filter(c => c !== 'periodo');
+  let html = '';
+  for (let i = 0; i < campos.length; i += 3) {
+    const trio = campos.slice(i, i + 3);
+    html += `<div class="form-grid three">${trio.map(c => `<div class="form-field"><label>${LABELS[c]||c}${s.tabela[c]?' ('+fmtV(s.tabela[c])+')':''}</label><input type="number" id="agf-${c}" min="0" step="1" placeholder="0" oninput="calcAgAuto()"></div>`).join('')}</div>`;
+  }
+  document.getElementById('ag-campos-proc').innerHTML = html;
+  calcAgAuto();
+}
+
+function calcAgAuto() {
+  const sid = document.getElementById('ag-hosp').value; if (!sid) return;
+  const s = svcById(sid);
+  const comp = (document.getElementById('ag-data').value || '').slice(0, 7) || '2026-06';
+  const periodos = parseFloat(document.getElementById('ag-periodos').value) || 0;
+  const proc = {};
+  s.campos.filter(c => c !== 'periodo').forEach(c => {
+    const el = document.getElementById('agf-' + c);
+    if (el && el.value) proc[c] = parseFloat(el.value) || 0;
+  });
+  let brutoTab = calcBrutoTabela(s, periodos, proc, comp);
+  const brutoManual = parseFloat(document.getElementById('ag-bruto').value) || 0;
+  const bruto = brutoManual || brutoTab;
+  if (!bruto) { document.getElementById('ag-calc').style.display = 'none'; return; }
+  const tx = calcTributos(bruto, s.nf);
+  const el = document.getElementById('ag-calc');
+  el.style.display = 'block';
+  if (!s.nf) {
+    const d = (comp >= (s.desconto_inicio||'9999') ? s.desconto_atual : s.desconto_antigo) * 100;
+    const bt = bruto / (1 - d/100);
+    el.innerHTML = `<div class="calc-row"><span>Bruto tabela</span><span>${fmtV(bt)}</span></div><div class="calc-row"><span>Desconto sócio ${d.toFixed(0)}%</span><span class="neg">−${fmtV(bt*d/100)}</span></div><div class="calc-row total"><span>Líquido final (sem NF)</span><span>${fmtV(bruto)}</span></div>`;
+  } else {
+    el.innerHTML = `<div class="calc-row"><span>Bruto NF</span><span>${fmtV(bruto)}</span></div><div class="calc-row"><span>COFINS 3,00%</span><span class="neg">−${fmtV(tx.cofins)}</span></div><div class="calc-row"><span>PIS 0,65%</span><span class="neg">−${fmtV(tx.pis)}</span></div><div class="calc-row"><span>CSL 1,00%</span><span class="neg">−${fmtV(tx.csl)}</span></div><div class="calc-row"><span>IRRF 1,50%</span><span class="neg">−${fmtV(tx.irrf)}</span></div><div class="calc-row"><span>Outros ~1,78%</span><span class="neg">−${fmtV(tx.totalTx-(tx.cofins+tx.pis+tx.csl+tx.irrf))}</span></div><div class="calc-row total"><span>Líquido final</span><span>${fmtV(tx.liquido)}</span></div>`;
+  }
+  if (!brutoManual) document.getElementById('ag-bruto').value = bruto.toFixed(2);
+}
+
+function saveAgenda() {
+  const sid = document.getElementById('ag-hosp').value;
+  const data = document.getElementById('ag-data').value;
+  if (!sid || !data) return alert('Selecione o serviço e a data');
+  const s = svcById(sid);
+  const periodos = parseFloat(document.getElementById('ag-periodos').value) || 0;
+  const brutoServico = parseFloat(document.getElementById('ag-bruto').value) || 0;
+  const proc = {};
+  if (s.periodoNoValor && periodos) proc['periodo'] = periodos;
+  s.campos.filter(c => c !== 'periodo').forEach(c => {
+    const el = document.getElementById('agf-' + c);
+    if (el && parseFloat(el.value)) proc[c] = parseFloat(el.value);
+  });
+  const tx = calcTributos(brutoServico, s.nf);
+  db.agenda.push({
+    id: uid(), hospId: sid, comp: data.slice(0, 7), data,
+    periodos, brutoServico, liqFinal: r2(tx.liquido), proc,
+    obs: document.getElementById('ag-obs').value
+  });
+  saveDb(); hideForm('form-agenda');
+  // reset
+  ['ag-data','ag-periodos','ag-bruto','ag-obs'].forEach(x => document.getElementById(x).value = '');
+  document.getElementById('ag-campos-proc').innerHTML = '';
+  document.getElementById('ag-calc').style.display = 'none';
+  renderAll();
+}
+
+function delAgenda(id) {
+  if (!confirm('Remover este lançamento?')) return;
+  db.agenda = db.agenda.filter(a => a.id !== id); saveDb(); renderAll();
+}
+
+function renderAgenda() {
+  populateSel('f-ag-hosp');
+  const sm = document.getElementById('f-ag-mes'); const curm = sm.value;
+  while (sm.options.length > 1) sm.remove(1);
+  [...new Set(db.agenda.map(a => a.comp))].sort().reverse().forEach(m => sm.add(new Option(fmtM(m), m)));
+  if (curm) sm.value = curm;
+  const fh = document.getElementById('f-ag-hosp').value;
+  const fm = document.getElementById('f-ag-mes').value;
+  const items = db.agenda.filter(a => (!fh || a.hospId === fh) && (!fm || a.comp === fm))
+    .sort((a, b) => b.data.localeCompare(a.data));
+  const el = document.getElementById('agenda-content');
+  if (!items.length) { el.innerHTML = '<div class="empty">Nenhuma agenda registrada para junho em diante.<br>Use o botão acima para adicionar.</div>'; return; }
+  const keys = [...new Set(items.map(a => a.comp + '||' + a.hospId))];
+  el.innerHTML = keys.map(k => {
+    const [comp, hid] = k.split('||'); const s = svcById(hid);
+    const its = items.filter(a => a.comp === comp && a.hospId === hid);
+    const tB = its.reduce((s, a) => s + a.brutoServico, 0);
+    const tL = its.reduce((s, a) => s + a.liqFinal, 0);
+    const tP = its.reduce((s, a) => s + (a.periodos||0), 0);
+    return `<div class="card" style="margin-bottom:12px;padding:14px 16px">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        <span class="svc-dot" style="background:${s.cor}"></span>
+        <span style="font-weight:500">${s.nome}</span>
+        <span class="badge b-gray">${fmtM(comp)}</span>
+        <span class="chip">${tP} períodos</span>
+        <span style="margin-left:auto;text-align:right">
+          ${tB>0&&tB!==tL?`<span style="font-size:10px;color:var(--text3);display:block">bruto ${fmtV(tB)}</span>`:''}
+          <span style="font-weight:500;color:${tL>0?'var(--success)':'var(--text3)'}">${tL>0?fmtV(tL):'a calcular'}</span>
+        </span>
+      </div>
+      ${its.map(a => {
+        const tags = Object.entries(a.proc||{}).filter(([k,v]) => v > 0 && k !== 'periodo').map(([k,v]) => `<span class="tag">${LABELS[k]||k}: <b>${v}</b></span>`).join('');
+        return `<div style="padding:6px 0;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <span style="font-size:11px;color:var(--text3);min-width:70px">${fmtD(a.data)}</span>
+          <div style="flex:1">${tags||'<span style="color:var(--text3);font-size:11px">sem detalhamento</span>'}</div>
+          ${a.obs?`<span style="font-size:11px;color:var(--text3)">${a.obs}</span>`:''}
+          <button class="btn btn-danger btn-sm" onclick="delAgenda('${a.id}')">✕</button>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+}
+
+// ---- PACIENTES ----
+function savePac() {
+  const nome = document.getElementById('pac-nome').value.trim();
+  if (!nome) return alert('Informe o nome');
+  db.pacientes.push({
+    id: uid(), nome,
+    nasc: document.getElementById('pac-nasc').value,
+    conv: document.getElementById('pac-conv').value,
+    hospId: document.getElementById('pac-hosp').value,
+    dataAtend: document.getElementById('pac-data').value,
+    proc: document.getElementById('pac-proc').value,
+    hist: document.getElementById('pac-hist').value,
+    ap: document.getElementById('pac-ap').checked,
+    interesse: document.getElementById('pac-interesse').checked
+  });
+  saveDb(); hideForm('form-pac');
+  ['pac-nome','pac-nasc','pac-conv','pac-data','pac-proc','pac-hist'].forEach(x => document.getElementById(x).value = '');
+  ['pac-ap','pac-interesse'].forEach(x => document.getElementById(x).checked = false);
+  renderAll();
+}
+
+function toggleAp(id) {
+  const p = db.pacientes.find(x => x.id === id); if (!p) return;
+  p.ap = !p.ap; saveDb(); renderAll();
+}
+function delPac(id) { db.pacientes = db.pacientes.filter(p => p.id !== id); saveDb(); renderAll(); }
+
+function renderPac() {
+  populateSel('f-pac-hosp'); populateSel('pac-hosp');
+  const sm = document.getElementById('f-pac-mes'); const curm = sm.value;
+  while (sm.options.length > 1) sm.remove(1);
+  [...new Set(db.pacientes.map(p => p.dataAtend?.slice(0,7)).filter(Boolean))].sort().reverse().forEach(m => sm.add(new Option(fmtM(m), m)));
+  if (curm) sm.value = curm;
+  const busca = (document.getElementById('f-pac-nome').value||'').toLowerCase();
+  const fh = document.getElementById('f-pac-hosp').value;
+  const ff = document.getElementById('f-pac-fil').value;
+  const fm = document.getElementById('f-pac-mes').value;
+  const pacs = db.pacientes.filter(p => {
+    if (busca && !p.nome.toLowerCase().includes(busca)) return false;
+    if (fh && p.hospId !== fh) return false;
+    if (ff === 'ap' && !p.ap) return false;
+    if (ff === 'interesse' && !p.interesse) return false;
+    if (fm && (!p.dataAtend || !p.dataAtend.startsWith(fm))) return false;
+    return true;
+  }).sort((a, b) => (b.dataAtend||'').localeCompare(a.dataAtend||''));
+  document.getElementById('tbody-pac').innerHTML = pacs.length ? pacs.map(p => {
+    const s = svcById(p.hospId);
+    const statusCell = p.ap
+      ? `<div><span class="badge b-ap">AP</span></div><button class="btn btn-success btn-sm" style="margin-top:4px" onclick="toggleAp('${p.id}')">AP chegou</button>`
+      : p.interesse ? `<span class="badge b-amber">Achado</span>` : '—';
+    return `<tr class="${p.ap?'ap-row':''}">
+      <td style="font-weight:500">${p.nome}</td>
+      <td style="font-size:11px">${fmtD(p.dataAtend)}</td>
+      <td><span class="svc-dot" style="background:${s.cor}"></span>${s.nome}</td>
+      <td style="font-size:11px">${p.conv||'—'}</td>
+      <td style="font-size:11px">${p.proc||'—'}</td>
+      <td style="font-size:11px;color:var(--text2)">${p.hist||'—'}</td>
+      <td>${statusCell}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="delPac('${p.id}')">✕</button></td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="8" class="empty">Nenhum paciente encontrado</td></tr>`;
+}
+
+// ---- FINANCEIRO ----
+function calcPgtoPreview() {
+  const sid = document.getElementById('pg-hosp').value;
+  const bruto = parseFloat(document.getElementById('pg-bruto').value) || 0;
+  const glosa = parseFloat(document.getElementById('pg-glosa').value) || 0;
+  const el = document.getElementById('pgto-calc');
+  if (!sid || !bruto) { el.style.display = 'none'; return; }
+  const s = svcById(sid);
+  el.style.display = 'block';
+  if (!s.nf) {
+    el.innerHTML = `<div class="calc-row"><span>Alpha — sem NF adicional</span><span>${fmtV(bruto)}</span></div>${glosa?`<div class="calc-row"><span>Glosa retroativa</span><span class="neg">−${fmtV(glosa)}</span></div><div class="calc-row total"><span>Líquido recebido</span><span>${fmtV(bruto-glosa)}</span></div>`:''}`;
+  } else {
+    const tx = calcTributos(bruto, true);
+    el.innerHTML = `<div class="calc-row"><span>Bruto NF</span><span>${fmtV(bruto)}</span></div><div class="calc-row"><span>COFINS 3,00%</span><span class="neg">−${fmtV(tx.cofins)}</span></div><div class="calc-row"><span>PIS 0,65%</span><span class="neg">−${fmtV(tx.pis)}</span></div><div class="calc-row"><span>CSL 1,00%</span><span class="neg">−${fmtV(tx.csl)}</span></div><div class="calc-row"><span>IRRF 1,50%</span><span class="neg">−${fmtV(tx.irrf)}</span></div><div class="calc-row"><span>Outros ~1,78%</span><span class="neg">−${fmtV(tx.totalTx-(tx.cofins+tx.pis+tx.csl+tx.irrf))}</span></div>${glosa?`<div class="calc-row"><span>Glosa retroativa</span><span class="neg">−${fmtV(glosa)}</span></div>`:''}<div class="calc-row total"><span>Líquido recebido</span><span>${fmtV(tx.liquido - glosa)}</span></div>`;
+  }
+}
+
+function savePgto() {
+  const sid = document.getElementById('pg-hosp').value;
+  const comp = document.getElementById('pg-comp').value;
+  const data = document.getElementById('pg-data').value;
+  const brutoNF = parseFloat(document.getElementById('pg-bruto').value) || 0;
+  if (!sid || !comp || !data || !brutoNF) return alert('Preencha todos os campos obrigatórios');
+  const s = svcById(sid);
+  const tx = calcTributos(brutoNF, s.nf);
+  const glosa = parseFloat(document.getElementById('pg-glosa').value) || 0;
+  db.pagamentos.push({
+    id: uid(), hospId: sid, comp, data, brutoNF, tributos: tx, glosa,
+    liquido: r2(tx.liquido - glosa),
+    obs: document.getElementById('pg-obs').value
+  });
+  saveDb(); hideForm('form-pgto');
+  ['pg-comp','pg-data','pg-bruto','pg-glosa','pg-obs'].forEach(x => document.getElementById(x).value = '');
+  document.getElementById('pgto-calc').style.display = 'none';
+  renderAll();
+}
+
+function delPgto(id) { if (!confirm('Remover?')) return; db.pagamentos = db.pagamentos.filter(p => p.id !== id); saveDb(); renderAll(); }
+
+function renderFin() {
+  populateSel('pg-hosp');
+  const meses = [...new Set(db.agenda.map(a => a.comp))].sort().reverse();
+  const rows = [];
+  meses.forEach(m => {
+    db.servicos.forEach(s => {
+      const ags = db.agenda.filter(a => a.comp === m && a.hospId === s.id);
+      if (!ags.length) return;
+      const pB = ags.reduce((acc, a) => acc + a.brutoServico, 0);
+      const pL = ags.reduce((acc, a) => acc + a.liqFinal, 0);
+      const pgto = db.pagamentos.find(p => p.comp === m && p.hospId === s.id);
+      rows.push({ comp: m, s, pB, pL, pgto });
+    });
+  });
+  const tL = rows.reduce((s,r) => s+r.pL, 0);
+  const tR = rows.filter(r=>r.pgto).reduce((s,r) => s+r.pgto.liquido, 0);
+  const tP = rows.filter(r=>!r.pgto).reduce((s,r) => s+r.pL, 0);
+  document.getElementById('fin-metrics').innerHTML = `
+    <div class="metric"><div class="metric-label">Líq. final registrado</div><div class="metric-value">${fmtV(tL)}</div><div class="metric-sub">após tributação</div></div>
+    <div class="metric"><div class="metric-label">Recebido confirmado</div><div class="metric-value" style="color:var(--success)">${fmtV(tR)}</div></div>
+    <div class="metric"><div class="metric-label">Pendente</div><div class="metric-value" style="color:var(--warn)">${fmtV(tP)}</div></div>
+    <div class="metric"><div class="metric-label">% recebido</div><div class="metric-value">${tL>0?Math.round(tR/tL*100):0}%</div></div>`;
+  document.getElementById('tbody-fin').innerHTML = rows.map(r => {
+    const tx = r.pgto?.tributos || {};
+    const prev = prevPgto(r.comp, r.s.delay);
+    const status = r.pgto
+      ? `<span class="badge b-green">✓ Recebido</span>`
+      : `<span class="badge b-red">Pendente</span>`;
+    return `<tr class="${r.pgto?.glosa?'glosa-row':''}">
+      <td style="font-weight:500">${fmtM(r.comp)}</td>
+      <td><span class="svc-dot" style="background:${r.s.cor}"></span>${r.s.nome}</td>
+      <td style="font-size:11px">${r.pB>0?fmtV(r.pB):'—'}</td>
+      <td style="font-size:11px;color:var(--danger)">${tx.cofins?fmtV(tx.cofins):'—'}</td>
+      <td style="font-size:11px;color:var(--danger)">${tx.pis?fmtV(tx.pis):'—'}</td>
+      <td style="font-size:11px;color:var(--danger)">${tx.csl?fmtV(tx.csl):'—'}</td>
+      <td style="font-size:11px;color:var(--danger)">${tx.irrf?fmtV(tx.irrf):'—'}</td>
+      <td style="font-size:11px;color:var(--danger)">${r.pgto?.glosa?`−${fmtV(r.pgto.glosa)}`:'—'}</td>
+      <td style="font-weight:500;color:${r.pL>0?'var(--success)':'var(--text3)'}">${r.pL>0?fmtV(r.pL):'a calcular'}</td>
+      <td style="font-size:11px">${r.pgto?fmtD(r.pgto.data):'—'}</td>
+      <td style="font-size:11px;color:var(--text3)">${r.pgto?'':fmtM(prev)}</td>
+      <td>${status}</td>
+      <td>${r.pgto?`<button class="btn btn-danger btn-sm" onclick="delPgto('${r.pgto.id}')">✕</button>`:''}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ---- SERVIÇOS ----
+function renderServicos() {
+  document.getElementById('lista-servicos').innerHTML = db.servicos.map(s => {
+    const ags = db.agenda.filter(a => a.hospId === s.id);
+    const pT = ags.reduce((acc,a) => acc+(a.periodos||0), 0);
+    const lT = ags.reduce((acc,a) => acc+a.liqFinal, 0);
+    const med = pT > 0 ? lT/pT : 0;
+    const txLabel = s.nf
+      ? `NF PJ — COFINS 3% + PIS 0,65% + CSL 1% + IRRF 1,5% + ~1,78% = ${(TX_EFETIVO*100).toFixed(2)}% total`
+      : `Sócio minoritário — recebe já líquido, sem NF adicional`;
+    return `<div class="card">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        <div style="width:12px;height:12px;border-radius:50%;background:${s.cor}"></div>
+        <span style="font-family:'Fraunces',serif;font-size:16px;font-weight:300">${s.nome}</span>
+        <span class="chip">${s.periodoNoValor?'período + produção':'só produção'}</span>
+        <span class="chip">delay ${s.delay}m</span>
+        <span class="chip" style="color:${s.nf?'var(--warn)':'var(--success)'}">${s.nf?'NF PJ':'sem NF'}</span>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px">${s.obs}</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:12px">${txLabel}</div>
+      <div class="metrics" style="grid-template-columns:repeat(3,1fr);margin-bottom:${Object.keys(s.tabela).length?'12px':'0'}">
+        <div class="metric" style="margin:0;padding:12px"><div class="metric-label">Líq. total jun+</div><div class="metric-value" style="font-size:18px;color:${lT>0?'var(--success)':'var(--text3)'}">${lT>0?fmtV(lT):'—'}</div></div>
+        <div class="metric" style="margin:0;padding:12px"><div class="metric-label">Períodos</div><div class="metric-value" style="font-size:18px">${pT}</div></div>
+        <div class="metric" style="margin:0;padding:12px"><div class="metric-label">Média/período</div><div class="metric-value" style="font-size:18px">${med>0?fmtV(med):'—'}</div></div>
+      </div>
+      ${Object.keys(s.tabela).length?`<div style="display:flex;flex-wrap:wrap;gap:5px">${Object.entries(s.tabela).map(([k,v])=>`<span class="tag">${LABELS[k]||k}: ${fmtV(v)}</span>`).join('')}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ---- DASHBOARD ----
+function renderDash() {
+  const meses = [...new Set(db.agenda.map(a => a.comp))].sort().reverse();
+  const mesRef = meses[0] || new Date().toISOString().slice(0,7);
+  const mesAnt = meses[1] || '';
+  const lRef = db.agenda.filter(a => a.comp === mesRef).reduce((s,a) => s+a.liqFinal, 0);
+  const lAnt = db.agenda.filter(a => a.comp === mesAnt).reduce((s,a) => s+a.liqFinal, 0);
+  const procRef = db.agenda.filter(a => a.comp === mesRef).reduce((s,a) => s+Object.values(a.proc||{}).reduce((x,y)=>x+y,0), 0);
+  const apCount = db.pacientes.filter(p => p.ap).length;
+
+  document.getElementById('dash-metrics').innerHTML = `
+    <div class="metric"><div class="metric-label">Líq. final ${fmtM(mesRef)}</div><div class="metric-value">${lRef>0?fmtV(lRef):'—'}</div><div class="metric-sub">${mesAnt?fmtV(lAnt)+' em '+fmtM(mesAnt):''}</div></div>
+    <div class="metric"><div class="metric-label">Procedimentos ${fmtM(mesRef)}</div><div class="metric-value">${procRef||'—'}</div></div>
+    <div class="metric"><div class="metric-label">Serviços</div><div class="metric-value">${db.servicos.length}</div></div>
+    <div class="metric"><div class="metric-label">AP pendente</div><div class="metric-value" style="color:${apCount>0?'var(--warn)':'var(--text3)'}">${apCount}</div></div>`;
+
+  // barras
+  const barsEl = document.getElementById('dash-bars');
+  const barsData = db.servicos.map(s => {
+    const ags = db.agenda.filter(a => a.hospId === s.id && a.comp === mesRef);
+    return { s, liq: ags.reduce((acc,a) => acc+a.liqFinal, 0) };
+  }).filter(x => x.liq > 0).sort((a,b) => b.liq - a.liq);
+  const maxV = barsData[0]?.liq || 1;
+  barsEl.innerHTML = barsData.length ? barsData.map(x => `
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+        <span><span class="svc-dot" style="background:${x.s.cor}"></span>${x.s.nome}</span>
+        <span style="font-weight:500">${fmtV(x.liq)}</span>
+      </div>
+      <div class="mini-bar"><div class="mini-bar-fill" style="width:${Math.round(x.liq/maxV*100)}%;background:${x.s.cor}"></div></div>
+    </div>`).join('') : '<div class="empty" style="padding:20px;font-size:11px">Registre agendas de junho para ver aqui</div>';
+
+  // previsão
+  const hoje = new Date();
+  const prevEl = document.getElementById('dash-prev');
+  prevEl.innerHTML = [0,1,2].map(i => {
+    const d = new Date(hoje.getFullYear(), hoje.getMonth() + i, 1);
+    const ms = d.getFullYear() + '-' + (d.getMonth()+1).toString().padStart(2,'0');
+    let total = 0;
+    db.servicos.forEach(s => {
+      const [dy,dm] = ms.split('-').map(Number);
+      const ca = new Date(dy, dm-1-s.delay, 1);
+      const cs = ca.getFullYear() + '-' + (ca.getMonth()+1).toString().padStart(2,'0');
+      total += db.agenda.filter(a => a.hospId === s.id && a.comp === cs).reduce((acc,a) => acc+a.liqFinal, 0);
+    });
+    const jaRec = db.pagamentos.filter(p => { const s = svcById(p.hospId); return prevPgto(p.comp, s.delay) === ms; }).reduce((acc,p) => acc+(p.liquido||0), 0);
+    return `<div style="padding:8px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:12px">
+      <span style="font-weight:500">${fmtM(ms)}</span>
+      <div style="text-align:right">
+        <div style="color:${total>0?'var(--success)':'var(--text3)'}">${total>0?fmtV(total):'a calcular'}</div>
+        ${jaRec>0?`<div style="font-size:10px;color:var(--text3)">já recebido: ${fmtV(jaRec)}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+
+  // AP pendentes
+  const apList = db.pacientes.filter(p => p.ap).sort((a,b) => (b.dataAtend||'').localeCompare(a.dataAtend||''));
+  const apSec = document.getElementById('dash-ap-section');
+  if (apList.length) {
+    apSec.innerHTML = `<div class="ap-alert" style="margin-bottom:14px">
+      <div class="ap-alert-title">⚑ ${apList.length} paciente${apList.length>1?'s':''} aguardando AP</div>
+      <table style="width:100%">
+        <thead><tr><th>Nome</th><th>Data</th><th>Serviço</th><th>Procedimento</th><th></th></tr></thead>
+        <tbody>${apList.map(p => {
+          const s = svcById(p.hospId);
+          return `<tr><td style="font-weight:500">${p.nome}</td><td style="font-size:11px">${fmtD(p.dataAtend)}</td><td style="font-size:11px"><span class="svc-dot" style="background:${s.cor}"></span>${s.nome}</td><td style="font-size:11px">${p.proc||'—'}</td><td><button class="btn btn-success btn-sm" onclick="toggleAp('${p.id}')">AP chegou</button></td></tr>`;
+        }).join('')}</tbody>
+      </table>
+    </div>`;
+  } else {
+    apSec.innerHTML = '';
+  }
+
+  // resumo
+  document.getElementById('tbody-resumo').innerHTML = meses.length ? meses.map(m => {
+    const vals = db.servicos.map(s => db.agenda.filter(a => a.hospId === s.id && a.comp === m).reduce((acc,a) => acc+a.liqFinal, 0));
+    const total = vals.reduce((s,v) => s+v, 0);
+    return `<tr>
+      <td style="font-weight:500">${fmtM(m)}</td>
+      ${vals.map(v => `<td style="font-size:11px;color:${v>0?'var(--text)':'var(--text3)'}">${v>0?fmtV(v):'—'}</td>`).join('')}
+      <td style="font-weight:500;color:var(--accent)">${fmtV(total)}</td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="7" class="empty" style="padding:20px">Dados aparecerão aqui conforme você registrar as agendas</td></tr>`;
+}
+
+function populateExportMes() {
+  const sel = document.getElementById('export-mes'); if (!sel) return;
+  const cur = sel.value;
+  while (sel.options.length) sel.remove(0);
+  const meses = [...new Set([
+    ...db.agenda.map(a => a.comp),
+    ...db.pacientes.map(p => p.dataAtend?.slice(0,7)).filter(Boolean)
+  ])].sort().reverse();
+  if (!meses.length) { sel.add(new Option('Nenhum mês', '')); return; }
+  meses.forEach(m => sel.add(new Option(fmtM(m), m)));
+  if (cur && meses.includes(cur)) sel.value = cur;
+}
+
+function exportExcel() {
+  const mes = document.getElementById('export-mes')?.value;
+  if (!mes) return alert('Selecione o mês para exportar');
+  const wb = XLSX.utils.book_new();
+  const header = ['Data', 'Paciente', 'Convênio', 'Procedimento', 'AP'];
+
+  db.servicos.forEach(s => {
+    const pacs = db.pacientes
+      .filter(p => p.hospId === s.id && p.dataAtend?.startsWith(mes))
+      .sort((a, b) => a.dataAtend.localeCompare(b.dataAtend));
+    if (!pacs.length) return;
+
+    // Group by date for subtotals
+    const rows = [header];
+    let lastDate = null;
+    let dayCount = { eda:0, cln:0, pa:0, pb:0, m:0, eco:0, cpre:0, ce:0, total:0 };
+
+    const flushDay = () => {
+      if (!lastDate) return;
+      const subtotal = ['', 'SUBTOTAL DIA', '',
+        `EDA:${dayCount.eda} CLN:${dayCount.cln} PA:${dayCount.pa} PB:${dayCount.pb}` +
+        (dayCount.m?` M:${dayCount.m}`:'') + (dayCount.eco?` ECO:${dayCount.eco}`:'') +
+        (dayCount.cpre?` CPRE:${dayCount.cpre}`:'') + (dayCount.ce?` CE:${dayCount.ce}`:'') +
+        ` | Total: ${dayCount.total}`,
+        ''];
+      rows.push(subtotal);
+      dayCount = { eda:0, cln:0, pa:0, pb:0, m:0, eco:0, cpre:0, ce:0, total:0 };
+    };
+
+    pacs.forEach(p => {
+      if (p.dataAtend !== lastDate) { flushDay(); lastDate = p.dataAtend; }
+      const proc = p.proc || '';
+      if (/EDA/i.test(proc)) dayCount.eda++;
+      if (/CLN/i.test(proc)) dayCount.cln++;
+      if (/\bPA\b/i.test(proc)) dayCount.pa++;
+      if (/\bPB\b/i.test(proc)) dayCount.pb++;
+      if (/\bM\b|Mucosect/i.test(proc)) dayCount.m++;
+      if (/ECO/i.test(proc)) dayCount.eco++;
+      if (/CPRE/i.test(proc)) dayCount.cpre++;
+      if (/\bCE\b|Corpo estranho/i.test(proc)) dayCount.ce++;
+      dayCount.total++;
+      rows.push([
+        fmtD(p.dataAtend),
+        p.nome,
+        p.conv || '—',
+        proc,
+        p.ap ? 'AP' : ''
+      ]);
+    });
+    flushDay();
+
+    // Total geral
+    const allPacs = pacs;
+    const totEda = allPacs.filter(p => /EDA/i.test(p.proc||'')).length;
+    const totCln = allPacs.filter(p => /CLN/i.test(p.proc||'')).length;
+    const totPa = allPacs.filter(p => /\bPA\b/i.test(p.proc||'')).length;
+    const totPb = allPacs.filter(p => /\bPB\b/i.test(p.proc||'')).length;
+    const totM = allPacs.filter(p => /\bM\b|Mucosect/i.test(p.proc||'')).length;
+    const totEco = allPacs.filter(p => /ECO/i.test(p.proc||'')).length;
+    const totCpre = allPacs.filter(p => /CPRE/i.test(p.proc||'')).length;
+    const totCe = allPacs.filter(p => /\bCE\b|Corpo estranho/i.test(p.proc||'')).length;
+    const totAp = allPacs.filter(p => p.ap).length;
+    rows.push([]);
+    rows.push(['', 'TOTAL MÊS', '',
+      `EDA:${totEda} CLN:${totCln} PA:${totPa} PB:${totPb}` +
+      (totM?` M:${totM}`:'') + (totEco?` ECO:${totEco}`:'') +
+      (totCpre?` CPRE:${totCpre}`:'') + (totCe?` CE:${totCe}`:'') +
+      ` | Total pac: ${allPacs.length}`,
+      `AP: ${totAp}`
+    ]);
+
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    // Column widths
+    ws['!cols'] = [{wch:12},{wch:40},{wch:20},{wch:40},{wch:6}];
+    XLSX.utils.book_append_sheet(wb, ws, s.nome.slice(0,31));
+  });
+
+  if (wb.SheetNames.length === 0) return alert('Nenhum paciente encontrado para ' + fmtM(mes));
+  XLSX.writeFile(wb, `EndoGestao_${mes}.xlsx`);
+}
+
+function renderAll() {
+  renderDash(); renderAgenda(); renderPac(); renderFin(); renderServicos(); populateExportMes();
+}
+
+// Init selects
+populateSel('nl-hosp');
+populateSel('ag-hosp');
+populateSel('pg-hosp');
+populateSel('pac-hosp');
+renderAll();
+</script>
+</body>
+</html>
