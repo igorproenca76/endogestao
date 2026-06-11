@@ -1028,6 +1028,78 @@ function renderDash() {
   }
 
   // resumo
+  // Exames e procedimentos do mês atual
+  const mesAtual = meses[0] || new Date().toISOString().slice(0,7);
+  const pacsAtual = db.pacientes.filter(p => p.dataAtend?.startsWith(mesAtual));
+
+  const examesTotal = {EDA:0, CLN:0, ECO:0, CPRE:0};
+  const procsTotal = {PA:0, PB:0, M:0, H:0, 'Punção':0, CE:0, SNE:0};
+  const examesPorSvc = {};
+  const procsPorSvc = {};
+
+  db.servicos.forEach(s => { examesPorSvc[s.id] = {EDA:0,CLN:0,ECO:0,CPRE:0}; procsPorSvc[s.id] = {PA:0,PB:0,M:0,H:0,'Punção':0,CE:0,SNE:0}; });
+
+  pacsAtual.forEach(p => {
+    const proc = p.proc || '';
+    EXAME_KEYS.forEach(e => { if(new RegExp('\\b'+e+'\\b','i').test(proc)) { examesTotal[e]++; if(examesPorSvc[p.hospId]) examesPorSvc[p.hospId][e]++; } });
+    PROC_KEYS.forEach(k => { if(new RegExp('\\b'+k+'\\b','i').test(proc)) { procsTotal[k]++; if(procsPorSvc[p.hospId]) procsPorSvc[p.hospId][k]++; } });
+  });
+
+  // Render exames panel
+  const exEl = document.getElementById('dash-exames');
+  const exGrandTotal = Object.values(examesTotal).reduce((a,b)=>a+b,0);
+  if (!exGrandTotal) {
+    exEl.innerHTML = '<div class="empty" style="padding:16px;font-size:11px">Sem dados para '+fmtM(mesAtual)+'</div>';
+  } else {
+    exEl.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px">
+        ${EXAME_KEYS.map(e => `<div class="metric" style="margin:0;padding:10px 12px;text-align:center">
+          <div class="metric-label">${e}</div>
+          <div class="metric-value" style="font-size:20px;color:var(--accent)">${examesTotal[e]||0}</div>
+        </div>`).join('')}
+      </div>
+      <table style="font-size:11px">
+        <thead><tr><th>Serviço</th>${EXAME_KEYS.map(e=>`<th style="text-align:center">${e}</th>`).join('')}<th style="text-align:center">Total</th></tr></thead>
+        <tbody>${db.servicos.map(s => {
+          const row = examesPorSvc[s.id];
+          const tot = Object.values(row).reduce((a,b)=>a+b,0);
+          if(!tot) return '';
+          return `<tr><td><span class="svc-dot" style="background:${s.cor}"></span>${s.nome}</td>${EXAME_KEYS.map(e=>`<td style="text-align:center">${row[e]||'—'}</td>`).join('')}<td style="text-align:center;font-weight:500">${tot}</td></tr>`;
+        }).join('')}
+        <tr style="border-top:1px solid var(--border);font-weight:500">
+          <td>Total</td>${EXAME_KEYS.map(e=>`<td style="text-align:center;color:var(--accent)">${examesTotal[e]||'—'}</td>`).join('')}<td style="text-align:center;color:var(--accent)">${exGrandTotal}</td>
+        </tr></tbody>
+      </table>`;
+  }
+
+  // Render procedimentos panel
+  const prEl = document.getElementById('dash-procs');
+  const prGrandTotal = Object.values(procsTotal).reduce((a,b)=>a+b,0);
+  const activeProcs = PROC_KEYS.filter(k => procsTotal[k] > 0);
+  if (!prGrandTotal) {
+    prEl.innerHTML = '<div class="empty" style="padding:16px;font-size:11px">Nenhum procedimento em '+fmtM(mesAtual)+'</div>';
+  } else {
+    prEl.innerHTML = `
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+        ${activeProcs.map(k => `<div class="metric" style="margin:0;padding:10px 14px;flex:1;min-width:60px;text-align:center">
+          <div class="metric-label">${k}</div>
+          <div class="metric-value" style="font-size:20px;color:var(--accent2)">${procsTotal[k]}</div>
+        </div>`).join('')}
+      </div>
+      ${activeProcs.length ? `<table style="font-size:11px">
+        <thead><tr><th>Serviço</th>${activeProcs.map(k=>`<th style="text-align:center">${k}</th>`).join('')}<th style="text-align:center">Total</th></tr></thead>
+        <tbody>${db.servicos.map(s => {
+          const row = procsPorSvc[s.id];
+          const tot = activeProcs.reduce((a,k)=>a+(row[k]||0),0);
+          if(!tot) return '';
+          return `<tr><td><span class="svc-dot" style="background:${s.cor}"></span>${s.nome}</td>${activeProcs.map(k=>`<td style="text-align:center">${row[k]||'—'}</td>`).join('')}<td style="text-align:center;font-weight:500">${tot}</td></tr>`;
+        }).join('')}
+        <tr style="border-top:1px solid var(--border);font-weight:500">
+          <td>Total</td>${activeProcs.map(k=>`<td style="text-align:center;color:var(--accent2)">${procsTotal[k]||'—'}</td>`).join('')}<td style="text-align:center;color:var(--accent2)">${prGrandTotal}</td>
+        </tr></tbody>
+      </table>` : ''}`;
+  }
+
   document.getElementById('tbody-resumo').innerHTML = meses.length ? meses.map(m => {
     const vals = db.servicos.map(s => db.agenda.filter(a => a.hospId === s.id && a.comp === m).reduce((acc,a) => acc+a.liqFinal, 0));
     const total = vals.reduce((s,v) => s+v, 0);
