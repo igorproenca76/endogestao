@@ -234,6 +234,16 @@ tr:hover td { background: rgba(0,0,0,0.02); }
     </div>
   </div>
   <div id="dash-ap-section"></div>
+  <div class="grid2" style="margin-bottom:14px">
+    <div class="card">
+      <div class="card-title" id="dash-exames-title">Exames</div>
+      <div id="dash-exames"></div>
+    </div>
+    <div class="card">
+      <div class="card-title" id="dash-procs-title">Procedimentos</div>
+      <div id="dash-procs"></div>
+    </div>
+  </div>
   <div class="card">
     <div class="card-title">Resumo mensal — líquido final</div>
     <div class="table-wrap">
@@ -961,12 +971,20 @@ function renderDash() {
   const mesAnt = meses[1] || '';
   const lRef = db.agenda.filter(a => a.comp === mesRef).reduce((s,a) => s+a.liqFinal, 0);
   const lAnt = db.agenda.filter(a => a.comp === mesAnt).reduce((s,a) => s+a.liqFinal, 0);
-  const procRef = db.agenda.filter(a => a.comp === mesRef).reduce((s,a) => s+Object.values(a.proc||{}).reduce((x,y)=>x+y,0), 0);
+  // procRef removed — now using patient-level exame counts
   const apCount = db.pacientes.filter(p => p.ap).length;
+
+  // Count exames and pacientes for current month
+  const pacsRef = db.pacientes.filter(p => p.dataAtend?.startsWith(mesRef));
+  const examesRef = pacsRef.reduce((acc, p) => {
+    const proc = p.proc || '';
+    return acc + EXAME_KEYS.filter(e => new RegExp('\\b'+e+'\\b','i').test(proc)).length;
+  }, 0);
 
   document.getElementById('dash-metrics').innerHTML = `
     <div class="metric"><div class="metric-label">Líq. final ${fmtM(mesRef)}</div><div class="metric-value">${lRef>0?fmtV(lRef):'—'}</div><div class="metric-sub">${mesAnt?fmtV(lAnt)+' em '+fmtM(mesAnt):''}</div></div>
-    <div class="metric"><div class="metric-label">Procedimentos ${fmtM(mesRef)}</div><div class="metric-value">${procRef||'—'}</div></div>
+    <div class="metric"><div class="metric-label">Pacientes ${fmtM(mesRef)}</div><div class="metric-value">${pacsRef.length||'—'}</div><div class="metric-sub">${db.pacientes.length} total desde jun</div></div>
+    <div class="metric"><div class="metric-label">Exames ${fmtM(mesRef)}</div><div class="metric-value">${examesRef||'—'}</div><div class="metric-sub">EDA · CLN · ECO · CPRE</div></div>
     <div class="metric"><div class="metric-label">Serviços</div><div class="metric-value">${db.servicos.length}</div></div>
     <div class="metric"><div class="metric-label">AP pendente</div><div class="metric-value" style="color:${apCount>0?'var(--warn)':'var(--text3)'}">${apCount}</div></div>`;
 
@@ -1046,6 +1064,10 @@ function renderDash() {
   });
 
   // Render exames panel
+  const exTitleEl = document.getElementById('dash-exames-title');
+  const prTitleEl = document.getElementById('dash-procs-title');
+  if (exTitleEl) exTitleEl.textContent = 'Exames — ' + fmtM(mesAtual);
+  if (prTitleEl) prTitleEl.textContent = 'Procedimentos — ' + fmtM(mesAtual);
   const exEl = document.getElementById('dash-exames');
   const exGrandTotal = Object.values(examesTotal).reduce((a,b)=>a+b,0);
   if (!exGrandTotal) {
