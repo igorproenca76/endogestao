@@ -310,7 +310,32 @@ tr:hover td { background: rgba(0,0,0,0.02); }
       </div>
       <div class="form-grid">
         <div class="form-field"><label>Data do atendimento</label><input type="date" id="pac-data"></div>
-        <div class="form-field"><label>Procedimento</label><input type="text" id="pac-proc" placeholder="Ex: EDA + CLN + P"></div>
+        <div class="form-field"><label>Convênio</label><input type="text" id="pac-conv2" placeholder="já preenchido acima" style="display:none"></div>
+      </div>
+      <div class="form-grid full">
+        <div class="form-field">
+          <label>Exames realizados</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px" id="exames-checks">
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="checkbox" id="ex-eda" style="width:auto;accent-color:var(--accent)"> EDA</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="checkbox" id="ex-cln" style="width:auto;accent-color:var(--accent)"> CLN</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="checkbox" id="ex-eco" style="width:auto;accent-color:var(--accent)"> ECO</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="checkbox" id="ex-cpre" style="width:auto;accent-color:var(--accent)"> CPRE</label>
+          </div>
+        </div>
+      </div>
+      <div class="form-grid full">
+        <div class="form-field">
+          <label>Procedimentos complementares</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px" id="proc-checks">
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="checkbox" id="pr-pa" style="width:auto;accent-color:var(--accent2)"> PA</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="checkbox" id="pr-pb" style="width:auto;accent-color:var(--accent2)"> PB</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="checkbox" id="pr-m" style="width:auto;accent-color:var(--accent2)"> M</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="checkbox" id="pr-h" style="width:auto;accent-color:var(--accent2)"> H</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="checkbox" id="pr-punc" style="width:auto;accent-color:var(--accent2)"> Punção</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="checkbox" id="pr-ce" style="width:auto;accent-color:var(--accent2)"> CE</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="checkbox" id="pr-sne" style="width:auto;accent-color:var(--accent2)"> SNE</label>
+          </div>
+        </div>
       </div>
       <div class="form-grid full">
         <div class="form-field"><label>Achados / observações clínicas</label><textarea id="pac-hist" placeholder="Achados relevantes, conduta..."></textarea></div>
@@ -345,7 +370,7 @@ tr:hover td { background: rgba(0,0,0,0.02); }
   <div class="card" style="padding:0">
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Nome</th><th>Atend.</th><th>Serviço</th><th>Convênio</th><th>Procedimento</th><th>Achados</th><th>Status</th><th></th></tr></thead>
+        <thead><tr><th>Nome</th><th>Atend.</th><th>Serviço</th><th>Convênio</th><th>Exames</th><th>Procedimentos</th><th>Achados</th><th>Status</th><th></th></tr></thead>
         <tbody id="tbody-pac"></tbody>
       </table>
     </div>
@@ -725,24 +750,50 @@ function renderAgenda() {
 }
 
 // ---- PACIENTES ----
+function buildProcString() {
+  const exames = ['eda','cln','eco','cpre'].filter(e => document.getElementById('ex-'+e)?.checked).map(e => e.toUpperCase());
+  const procs = [
+    ['pa','PA'],['pb','PB'],['m','M'],['h','H'],['punc','Punção'],['ce','CE'],['sne','SNE']
+  ].filter(([id]) => document.getElementById('pr-'+id)?.checked).map(([,label]) => label);
+  return [...exames, ...procs].join(' + ');
+}
+
 function savePac() {
   const nome = document.getElementById('pac-nome').value.trim();
   if (!nome) return alert('Informe o nome');
+  const proc = buildProcString();
   db.pacientes.push({
     id: uid(), nome,
     nasc: document.getElementById('pac-nasc').value,
     conv: document.getElementById('pac-conv').value,
     hospId: document.getElementById('pac-hosp').value,
     dataAtend: document.getElementById('pac-data').value,
-    proc: document.getElementById('pac-proc').value,
+    proc,
     hist: document.getElementById('pac-hist').value,
     ap: document.getElementById('pac-ap').checked,
     interesse: document.getElementById('pac-interesse').checked
   });
   saveDb(); hideForm('form-pac');
-  ['pac-nome','pac-nasc','pac-conv','pac-data','pac-proc','pac-hist'].forEach(x => document.getElementById(x).value = '');
-  ['pac-ap','pac-interesse'].forEach(x => document.getElementById(x).checked = false);
+  ['pac-nome','pac-nasc','pac-conv','pac-data','pac-hist'].forEach(x => document.getElementById(x).value = '');
+  ['pac-ap','pac-interesse','ex-eda','ex-cln','ex-eco','ex-cpre','pr-pa','pr-pb','pr-m','pr-h','pr-punc','pr-ce','pr-sne'].forEach(x => {
+    const el = document.getElementById(x); if(el) el.checked = false;
+  });
   renderAll();
+}
+
+const EXAME_KEYS = ['EDA','CLN','ECO','CPRE'];
+const PROC_KEYS = ['PA','PB','M','H','Punção','CE','SNE'];
+
+function splitExames(proc) {
+  if (!proc) return '—';
+  const found = EXAME_KEYS.filter(e => new RegExp('\\b'+e+'\\b','i').test(proc));
+  return found.length ? found.map(e => `<span class="tag" style="color:var(--accent)">${e}</span>`).join(' ') : '—';
+}
+
+function splitProcs(proc) {
+  if (!proc) return '—';
+  const found = PROC_KEYS.filter(p => new RegExp('\\b'+p+'\\b','i').test(proc));
+  return found.length ? found.map(p => `<span class="tag" style="color:var(--accent2)">${p}</span>`).join(' ') : '—';
 }
 
 function toggleAp(id) {
@@ -779,7 +830,8 @@ function renderPac() {
       <td style="font-size:11px">${fmtD(p.dataAtend)}</td>
       <td><span class="svc-dot" style="background:${s.cor}"></span>${s.nome}</td>
       <td style="font-size:11px">${p.conv||'—'}</td>
-      <td style="font-size:11px">${p.proc||'—'}</td>
+      <td style="font-size:11px">${splitExames(p.proc)}</td>
+      <td style="font-size:11px">${splitProcs(p.proc)}</td>
       <td style="font-size:11px;color:var(--text2)">${p.hist||'—'}</td>
       <td>${statusCell}</td>
       <td><button class="btn btn-danger btn-sm" onclick="delPac('${p.id}')">✕</button></td>
@@ -1004,7 +1056,7 @@ function exportExcel() {
   const mes = document.getElementById('export-mes')?.value;
   if (!mes) return alert('Selecione o mês para exportar');
   const wb = XLSX.utils.book_new();
-  const header = ['Data', 'Paciente', 'Convênio', 'Procedimento', 'AP'];
+  const header = ['Data', 'Paciente', 'Convênio', 'Exames', 'Procedimentos', 'AP'];
 
   db.servicos.forEach(s => {
     const pacs = db.pacientes
@@ -1045,7 +1097,8 @@ function exportExcel() {
         fmtD(p.dataAtend),
         p.nome,
         p.conv || '—',
-        proc,
+        EXAME_KEYS.filter(e => new RegExp('\\b'+e+'\\b','i').test(proc)).join(' + ') || '—',
+        PROC_KEYS.filter(p2 => new RegExp('\\b'+p2+'\\b','i').test(proc)).join(' + ') || '—',
         p.ap ? 'AP' : ''
       ]);
     });
@@ -1073,7 +1126,7 @@ function exportExcel() {
 
     const ws = XLSX.utils.aoa_to_sheet(rows);
     // Column widths
-    ws['!cols'] = [{wch:12},{wch:40},{wch:20},{wch:40},{wch:6}];
+    ws['!cols'] = [{wch:12},{wch:40},{wch:20},{wch:20},{wch:20},{wch:6}];
     XLSX.utils.book_append_sheet(wb, ws, s.nome.slice(0,31));
   });
 
