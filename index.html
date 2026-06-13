@@ -560,6 +560,11 @@ function initDb() {
        periodos:2, brutoServico:0, liqFinal:0,
        proc:{eda:11, cln:5, pxA:3, pxB:3},
        obs:'15 pac · AP pendente: Andrea, Aparecida'},
+      // 12/06/2026 — SL Anália — 1 período
+      {id:'ag_a0612', hospId:'sl_analia', comp:'2026-06', data:'2026-06-12',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{edaDiag:3, edaTer:1, eco:2, pa:1},
+       obs:'4 pac · EDA Diag: 3 · EDA Ter: 1 (Fernando) · ECO: 2'},
     ],
     pacientes: [
       // ---- SL MORUMBI 02/06/2026 ----
@@ -616,6 +621,11 @@ function initDb() {
       {id:'p_n10_13',nome:'Silvia Jane Viana Rebolo',nasc:'1970-03-23',conv:'Sul América',hospId:'nipo',dataAtend:'2026-06-10',proc:'CLN + PB',hist:'',ap:false,interesse:false},
       {id:'p_n10_14',nome:'Shisako Nonaka',nasc:'1950-11-14',conv:'Promocional',hospId:'nipo',dataAtend:'2026-06-10',proc:'CLN',hist:'',ap:false,interesse:false},
       {id:'p_n10_15',nome:'Alex dos Reis Oliveira',nasc:'1980-08-11',conv:'Sul América',hospId:'nipo',dataAtend:'2026-06-10',proc:'CLN + PB',hist:'',ap:false,interesse:false},
+      // ---- SL ANÁLIA 12/06/2026 ----
+      {id:'p_a0612_01',nome:'Fernando Giansante',nasc:'1972-10-11',conv:'Sul América',hospId:'sl_analia',dataAtend:'2026-06-12',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_a0612_02',nome:'Mirian Rodrigues Aud',nasc:'1987-12-24',conv:'Sul América',hospId:'sl_analia',dataAtend:'2026-06-12',proc:'EDA + ECO',hist:'',ap:false,interesse:false},
+      {id:'p_a0612_03',nome:'Raquel Cristina Rodrigues Bendassoli',nasc:'1995-04-23',conv:'Porto Saúde',hospId:'sl_analia',dataAtend:'2026-06-12',proc:'ECO',hist:'',ap:false,interesse:false},
+      {id:'p_a0612_04',nome:'Nayara Carvalho Cappellati',nasc:'1991-10-31',conv:'Bradesco',hospId:'sl_analia',dataAtend:'2026-06-12',proc:'EDA',hist:'',ap:false,interesse:false},
     ],
     pagamentos: []
   };
@@ -793,9 +803,50 @@ function savePac() {
 
 const EXAME_KEYS = ['EDA','CLN','ECO','CPRE'];
 const PROC_KEYS = ['PA','PB','M','H','Punção','CE','SNE'];
+const PROC_TER = ['PA','PB','M','H']; // procedimentos que tornam EDA/CLN terapêuticos
 
-function splitExames(proc) {
+// Para SL Anália: classifica EDA/CLN como Diagnóstica ou Terapêutica
+function analiaTipos(proc) {
+  if (!proc) return {edaDiag:0, edaTer:0, clnDiag:0, clnTer:0};
+  const hasEDA = /\bEDA\b/i.test(proc);
+  const hasCLN = /\bCLN\b/i.test(proc);
+  const hasTer = PROC_TER.some(p => new RegExp('\\b'+p+'\\b','i').test(proc));
+  return {
+    edaDiag: hasEDA && !hasTer ? 1 : 0,
+    edaTer:  hasEDA && hasTer  ? 1 : 0,
+    clnDiag: hasCLN && !hasTer ? 1 : 0,
+    clnTer:  hasCLN && hasTer  ? 1 : 0,
+  };
+}
+
+// Calcula valor bruto do Anália para um conjunto de pacientes
+function analiaCalcBruto(pacs) {
+  const tabela = {edaDiag:110, edaTer:185, clnDiag:210, clnTer:290, eco:500, ecoPunc:600, cpre:550};
+  let counts = {edaDiag:0, edaTer:0, clnDiag:0, clnTer:0, eco:0, ecoPunc:0, cpre:0};
+  pacs.forEach(p => {
+    const t = analiaTipos(p.proc||'');
+    counts.edaDiag += t.edaDiag; counts.edaTer += t.edaTer;
+    counts.clnDiag += t.clnDiag; counts.clnTer += t.clnTer;
+    if (/ECO\s*\+\s*Pun|ECO\s*Pun/i.test(p.proc||'')) counts.ecoPunc++;
+    else if (/\bECO\b/i.test(p.proc||'')) counts.eco++;
+    if (/\bCPRE\b/i.test(p.proc||'')) counts.cpre++;
+  });
+  return Object.entries(counts).reduce((s,[k,v]) => s + v*(tabela[k]||0), 0);
+}
+
+function splitExames(proc, hospId) {
   if (!proc) return '—';
+  if (hospId === 'sl_analia') {
+    const t = analiaTipos(proc);
+    const tags = [];
+    if (t.edaDiag) tags.push('<span class="tag" style="color:var(--accent)">EDA Diag</span>');
+    if (t.edaTer)  tags.push('<span class="tag" style="color:var(--warn)">EDA Ter</span>');
+    if (t.clnDiag) tags.push('<span class="tag" style="color:var(--accent)">CLN Diag</span>');
+    if (t.clnTer)  tags.push('<span class="tag" style="color:var(--warn)">CLN Ter</span>');
+    if (/\bECO\b/i.test(proc)) tags.push('<span class="tag" style="color:var(--accent)">ECO</span>');
+    if (/\bCPRE\b/i.test(proc)) tags.push('<span class="tag" style="color:var(--accent)">CPRE</span>');
+    return tags.length ? tags.join(' ') : '—';
+  }
   const found = EXAME_KEYS.filter(e => new RegExp('\\b'+e+'\\b','i').test(proc));
   return found.length ? found.map(e => `<span class="tag" style="color:var(--accent)">${e}</span>`).join(' ') : '—';
 }
@@ -840,7 +891,7 @@ function renderPac() {
       <td style="font-size:11px">${fmtD(p.dataAtend)}</td>
       <td><span class="svc-dot" style="background:${s.cor}"></span>${s.nome}</td>
       <td style="font-size:11px">${p.conv||'—'}</td>
-      <td style="font-size:11px">${splitExames(p.proc)}</td>
+      <td style="font-size:11px">${splitExames(p.proc, p.hospId)}</td>
       <td style="font-size:11px">${splitProcs(p.proc)}</td>
       <td style="font-size:11px;color:var(--text2)">${p.hist||'—'}</td>
       <td>${statusCell}</td>
