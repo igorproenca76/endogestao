@@ -456,7 +456,7 @@ const SERVICOS_CONFIG = [
     periodoNoValor: true,
     tabela: { periodo: 1000, sobreaviso: 600, polipectomia: 100, terapeutica: 200, eco: 1200, ecoPunc: 1500, cpre: 1500, meioEco: 600, meioEcoPunc: 750 },
     campos: ['periodo','sobreaviso','polipectomia','terapeutica','eco','ecoPunc','cpre','meioEco','meioEcoPunc'],
-    obs: 'Período + produção tabelada. Delay: 1 mês. NF PJ. Fechamento: PDF por paciente.'
+    obs: 'Período inclui EDA e CLN. ECO, CPRE e procedimentos (PA, PB, M, H etc.) são remunerados separadamente. Delay: 1 mês. NF PJ. Fechamento: PDF por paciente.'
   },
   {
     id: 'nipo', nome: 'NIPO', cor: CORES.nipo, delay: 2, nf: true,
@@ -565,6 +565,12 @@ function initDb() {
        periodos:1, brutoServico:0, liqFinal:0,
        proc:{edaDiag:3, edaTer:1, eco:2, pa:1},
        obs:'4 pac · EDA Diag: 3 · EDA Ter: 1 (Fernando) · ECO: 2'},
+      // 15/06/2026 — H9J — 1 período + PA:2 + PB:1
+      // Período cobre EDA+CLN; ECO/CPRE/procedimentos faturados separadamente
+      {id:'ag_h0615', hospId:'h9j', comp:'2026-06', data:'2026-06-15',
+       periodos:1, brutoServico:1300, liqFinal:1196.91,
+       proc:{periodo:1, polipectomia:3},
+       obs:'2 pac · 1 período R$1.000 + 3 polipectomias R$300 = R$1.300 bruto'},
     ],
     pacientes: [
       // ---- SL MORUMBI 02/06/2026 ----
@@ -626,6 +632,9 @@ function initDb() {
       {id:'p_a0612_02',nome:'Mirian Rodrigues Aud',nasc:'1987-12-24',conv:'Sul América',hospId:'sl_analia',dataAtend:'2026-06-12',proc:'EDA + ECO',hist:'',ap:false,interesse:false},
       {id:'p_a0612_03',nome:'Raquel Cristina Rodrigues Bendassoli',nasc:'1995-04-23',conv:'Porto Saúde',hospId:'sl_analia',dataAtend:'2026-06-12',proc:'ECO',hist:'',ap:false,interesse:false},
       {id:'p_a0612_04',nome:'Nayara Carvalho Cappellati',nasc:'1991-10-31',conv:'Bradesco',hospId:'sl_analia',dataAtend:'2026-06-12',proc:'EDA',hist:'',ap:false,interesse:false},
+      // ---- H9J 15/06/2026 ----
+      {id:'p_h0615_01',nome:'Edson Aparecido Coral',nasc:'1960-06-08',conv:'CASSI',hospId:'h9j',dataAtend:'2026-06-15',proc:'EDA + CLN + PA + PB',hist:'',ap:false,interesse:false},
+      {id:'p_h0615_02',nome:'Marina Fallone Koskinas',nasc:'1951-07-10',conv:'Assefaz',hospId:'h9j',dataAtend:'2026-06-15',proc:'EDA + CLN + PA',hist:'',ap:false,interesse:false},
     ],
     pagamentos: []
   };
