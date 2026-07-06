@@ -565,12 +565,51 @@ function initDb() {
        periodos:1, brutoServico:0, liqFinal:0,
        proc:{edaDiag:3, edaTer:1, eco:2, pa:1},
        obs:'4 pac · EDA Diag: 3 · EDA Ter: 1 (Fernando) · ECO: 2'},
+      // 16/06/2026 — SL Morumbi — 2 períodos
+      {id:'ag_m0616', hospId:'sl_morumbi', comp:'2026-06', data:'2026-06-16',
+       periodos:2, brutoServico:0, liqFinal:0,
+       proc:{eda:8, cln:4, pa:2, hemostasia:1, desc:1, sne:1},
+       obs:'9 pac · Desc: Ana Carolina · SNE: Esterina'},
+      // 17/06/2026 — NIPO — 2 períodos
+      {id:'ag_n0617', hospId:'nipo', comp:'2026-06', data:'2026-06-17',
+       periodos:2, brutoServico:0, liqFinal:0,
+       proc:{eda:11, cln:5, pxA:4, pxB:3, hemostasia:1, mucose:1, sne:1},
+       obs:'13 pac · AP: Maria Edileuda, Marli'},
+      // 19/06/2026 — SL Anália — 1 período
+      {id:'ag_a0619', hospId:'sl_analia', comp:'2026-06', data:'2026-06-19',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{edaDiag:1, edaTer:1, clnDiag:1, clnTer:1, eco:3, pa:1, mucose:1},
+       obs:'3 pac · AP: Patricia'},
+      // 20/06/2026 — NIPO — 2 períodos
+      {id:'ag_n0620', hospId:'nipo', comp:'2026-06', data:'2026-06-20',
+       periodos:2, brutoServico:0, liqFinal:0,
+       proc:{eda:8, cln:4, pxA:4, pxB:2},
+       obs:'9 pac · AP: Wagner'},
+      // 22/06/2026 — SL Alpha — 1 período
+      {id:'ag_al0622', hospId:'sl_alpha', comp:'2026-06', data:'2026-06-22',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{eda:3, cln:1, eco:2, poliB:1},
+       obs:'4 pac'},
+      // 23/06/2026 — SL Morumbi — 1 período
+      {id:'ag_m0623', hospId:'sl_morumbi', comp:'2026-06', data:'2026-06-23',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{eda:9, cln:6, pa:1, pb:2, mucose:1, hemostasia:1},
+       obs:'10 pac · AP: Tabatha, Igor, Jussara, Maria Neide, Quelen'},
+      // 24/06/2026 — NIPO — 1 período (última agenda de junho)
+      {id:'ag_n0624', hospId:'nipo', comp:'2026-06', data:'2026-06-24',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{eda:2, cln:5, pxA:2},
+       obs:'5 pac'},
       // 15/06/2026 — H9J — 1 período + PA:2 + PB:1
       // Período cobre EDA+CLN; ECO/CPRE/procedimentos faturados separadamente
       {id:'ag_h0615', hospId:'h9j', comp:'2026-06', data:'2026-06-15',
        periodos:1, brutoServico:1300, liqFinal:1196.91,
        proc:{periodo:1, polipectomia:3},
        obs:'2 pac · 1 período R$1.000 + 3 polipectomias R$300 = R$1.300 bruto'},
+      // 16/06/2026 — SL Morumbi — 2 períodos
+      
+      // 16/06/2026 — SL Morumbi — 2 períodos
+      
     ],
     pacientes: [
       // ---- SL MORUMBI 02/06/2026 ----
@@ -635,6 +674,86 @@ function initDb() {
       // ---- H9J 15/06/2026 ----
       {id:'p_h0615_01',nome:'Edson Aparecido Coral',nasc:'1960-06-08',conv:'CASSI',hospId:'h9j',dataAtend:'2026-06-15',proc:'EDA + CLN + PA + PB',hist:'',ap:false,interesse:false},
       {id:'p_h0615_02',nome:'Marina Fallone Koskinas',nasc:'1951-07-10',conv:'Assefaz',hospId:'h9j',dataAtend:'2026-06-15',proc:'EDA + CLN + PA',hist:'',ap:false,interesse:false},
+      // ---- SL MORUMBI 16/06/2026 ----
+      {id:'p_m0616_01',nome:'Rute Santos Montalvao',nasc:'1987-01-25',conv:'Sul América',hospId:'sl_morumbi',dataAtend:'2026-06-16',proc:'EDA + CLN',hist:'',ap:false,interesse:false},
+      {id:'p_m0616_02',nome:'Ivani da Silva Souza Braga',nasc:'1979-01-01',conv:'Sul América',hospId:'sl_morumbi',dataAtend:'2026-06-16',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_m0616_03',nome:'Johnny Hess',nasc:'1962-05-27',conv:'Saúde Caixa',hospId:'sl_morumbi',dataAtend:'2026-06-16',proc:'EDA + H',hist:'',ap:false,interesse:false},
+      {id:'p_m0616_04',nome:'Marco Antonio dos Santos Rodrigues',nasc:'1986-08-12',conv:'Sul América',hospId:'sl_morumbi',dataAtend:'2026-06-16',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_m0616_05',nome:'Christiano Jaques Amorim',nasc:'1990-10-03',conv:'Bradesco',hospId:'sl_morumbi',dataAtend:'2026-06-16',proc:'EDA + CLN',hist:'',ap:false,interesse:false},
+      {id:'p_m0616_06',nome:'Fabiana Parede Misieri Rech',nasc:'1975-12-05',conv:'Bradesco',hospId:'sl_morumbi',dataAtend:'2026-06-16',proc:'EDA + CLN + PA',hist:'',ap:false,interesse:false},
+      {id:'p_m0616_07',nome:'Deborah D Annolfo Tozato',nasc:'1992-08-30',conv:'Sul América',hospId:'sl_morumbi',dataAtend:'2026-06-16',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_m0616_08',nome:'Ana Carolina Ribeiro Sucupira Cruz',nasc:'1979-12-10',conv:'Porto Saúde',hospId:'sl_morumbi',dataAtend:'2026-06-16',proc:'CLN + Desc',hist:'Descompressão colônica',ap:false,interesse:false},
+      {id:'p_m0616_09',nome:'Esterina Rossi Nahas',nasc:'1931-02-13',conv:'Sul América',hospId:'sl_morumbi',dataAtend:'2026-06-16',proc:'EDA + SNE',hist:'SNE por anestesia local',ap:false,interesse:false},
+      // ---- NIPO 17/06/2026 ----
+      {id:'p_n0617_01',nome:'Luisa Beserra de Oliveira',nasc:'1983-05-05',conv:'Porto Saúde',hospId:'nipo',dataAtend:'2026-06-17',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0617_02',nome:'Camila Emy Goto',nasc:'1982-03-10',conv:'Notre Dame',hospId:'nipo',dataAtend:'2026-06-17',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0617_03',nome:'Sonia Aparecida Salute',nasc:'1955-12-05',conv:'Notre Dame',hospId:'nipo',dataAtend:'2026-06-17',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0617_04',nome:'Felipe Esteban Mancheno Yepez',nasc:'2005-10-10',conv:'Promocional',hospId:'nipo',dataAtend:'2026-06-17',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0617_05',nome:'Valderes Jacob da Silva',nasc:'1965-04-10',conv:'Central Nacional Unimed',hospId:'nipo',dataAtend:'2026-06-17',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_n0617_06',nome:'Maria Edileuda Correia de Lima',nasc:'1977-04-07',conv:'Central Nacional Unimed',hospId:'nipo',dataAtend:'2026-06-17',proc:'EDA + PA',hist:'',ap:true,interesse:false},
+      {id:'p_n0617_07',nome:'Nathalia de Freitas Rugene',nasc:'1992-12-24',conv:'Sul América',hospId:'nipo',dataAtend:'2026-06-17',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0617_08',nome:'Marli da Conceicao Machado',nasc:'1954-07-05',conv:'Postal Saúde',hospId:'nipo',dataAtend:'2026-06-17',proc:'EDA + CLN + PA',hist:'',ap:true,interesse:false},
+      {id:'p_n0617_09',nome:'Angela Silva dos Santos',nasc:'1979-06-27',conv:'Notre Dame',hospId:'nipo',dataAtend:'2026-06-17',proc:'EDA + CLN + PA',hist:'',ap:false,interesse:false},
+      {id:'p_n0617_10',nome:'Susana Kominich',nasc:'1962-12-18',conv:'Sul América',hospId:'nipo',dataAtend:'2026-06-17',proc:'CLN + PB',hist:'',ap:false,interesse:false},
+      {id:'p_n0617_11',nome:'Odair Sales de Oliveira',nasc:'1963-12-02',conv:'Porto Saúde',hospId:'nipo',dataAtend:'2026-06-17',proc:'EDA + CLN + PB',hist:'',ap:false,interesse:false},
+      {id:'p_n0617_12',nome:'Antonio Minorelli',nasc:'',conv:'Corpo Clínico',hospId:'nipo',dataAtend:'2026-06-17',proc:'CLN + PB + H + M',hist:'',ap:false,interesse:false},
+      {id:'p_n0617_13',nome:'Kricor Kullukian',nasc:'1946-09-25',conv:'Central Nacional Unimed',hospId:'nipo',dataAtend:'2026-06-17',proc:'EDA + SNE',hist:'',ap:false,interesse:false},
+      // ---- SL ANÁLIA 19/06/2026 ----
+      {id:'p_a0619_01',nome:'Patricia Cristiane Macedo Lima',nasc:'1974-04-13',conv:'Bradesco',hospId:'sl_analia',dataAtend:'2026-06-19',proc:'EDA + CLN + ECO + PA + M',hist:'',ap:true,interesse:false},
+      {id:'p_a0619_02',nome:'Gabriela Laurentino Pinheiro',nasc:'1982-08-03',conv:'Sul América',hospId:'sl_analia',dataAtend:'2026-06-19',proc:'ECO',hist:'',ap:false,interesse:false},
+      {id:'p_a0619_03',nome:'Anatalia Holanda Cavalcante',nasc:'1991-12-25',conv:'Bradesco',hospId:'sl_analia',dataAtend:'2026-06-19',proc:'EDA + CLN + ECO',hist:'',ap:false,interesse:false},
+      // ---- NIPO 20/06/2026 ----
+      {id:'p_n0620_01',nome:'Alvaro Yamauchi',nasc:'1961-07-16',conv:'Amafresp',hospId:'nipo',dataAtend:'2026-06-20',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_n0620_02',nome:'Mirelle Alves Martins',nasc:'2004-10-18',conv:'Bradesco',hospId:'nipo',dataAtend:'2026-06-20',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0620_03',nome:'Paulo Alexandro Vieira Arruda',nasc:'1980-09-16',conv:'Porto Saúde',hospId:'nipo',dataAtend:'2026-06-20',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0620_04',nome:'Aldjane Dionisio de Lima Silva',nasc:'1972-09-21',conv:'Porto Saúde',hospId:'nipo',dataAtend:'2026-06-20',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0620_05',nome:'Wagner Lucchesi',nasc:'1955-02-10',conv:'GEAP',hospId:'nipo',dataAtend:'2026-06-20',proc:'EDA + PA',hist:'',ap:true,interesse:false},
+      {id:'p_n0620_06',nome:'Maria Aparecida Minelli',nasc:'1950-04-21',conv:'Promocional',hospId:'nipo',dataAtend:'2026-06-20',proc:'CLN + PB',hist:'',ap:false,interesse:false},
+      {id:'p_n0620_07',nome:'Rosangela Araujo de Almeida',nasc:'1969-01-23',conv:'Bradesco',hospId:'nipo',dataAtend:'2026-06-20',proc:'EDA + CLN',hist:'',ap:false,interesse:false},
+      {id:'p_n0620_08',nome:'Gilson Neves de Oliveira',nasc:'1969-02-08',conv:'Notre Dame',hospId:'nipo',dataAtend:'2026-06-20',proc:'EDA + CLN + PA + PB',hist:'',ap:false,interesse:false},
+      {id:'p_n0620_09',nome:'Ligia Scomparini',nasc:'1957-08-27',conv:'Sul América',hospId:'nipo',dataAtend:'2026-06-20',proc:'EDA + CLN + PA',hist:'',ap:false,interesse:false},
+      // ---- SL ALPHA 22/06/2026 ----
+      {id:'p_al0622_01',nome:'Joao Matheus de Araujo Beija',nasc:'1997-06-24',conv:'Sul América',hospId:'sl_alpha',dataAtend:'2026-06-22',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_al0622_02',nome:'Anny de Oliveira Barros',nasc:'2008-02-13',conv:'Bradesco',hospId:'sl_alpha',dataAtend:'2026-06-22',proc:'ECO',hist:'',ap:false,interesse:false},
+      {id:'p_al0622_03',nome:'Matheus Regly Ramos',nasc:'1994-09-17',conv:'Sul América',hospId:'sl_alpha',dataAtend:'2026-06-22',proc:'EDA + ECO',hist:'',ap:false,interesse:false},
+      {id:'p_al0622_04',nome:'Gerson de Sousa Brito',nasc:'1969-01-16',conv:'Bradesco',hospId:'sl_alpha',dataAtend:'2026-06-22',proc:'EDA + CLN + PB',hist:'',ap:false,interesse:false},
+      // ---- SL MORUMBI 23/06/2026 ----
+      {id:'p_m0623_01',nome:'Vivian Maria Bolzan Garzi',nasc:'1983-06-28',conv:'Bradesco',hospId:'sl_morumbi',dataAtend:'2026-06-23',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_m0623_02',nome:'Maria Izabel Yanoquiti dos Santos',nasc:'1984-10-20',conv:'Sul América',hospId:'sl_morumbi',dataAtend:'2026-06-23',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_m0623_03',nome:'Tabatha Fernandes Romano de Castro',nasc:'1986-11-17',conv:'Sul América',hospId:'sl_morumbi',dataAtend:'2026-06-23',proc:'EDA + CLN',hist:'',ap:true,interesse:false},
+      {id:'p_m0623_04',nome:'Igor Rodrigues dos Reis',nasc:'1990-11-18',conv:'Bradesco',hospId:'sl_morumbi',dataAtend:'2026-06-23',proc:'EDA + CLN',hist:'',ap:true,interesse:false},
+      {id:'p_m0623_05',nome:'Jussara Lourenco de Oliveira',nasc:'1952-03-03',conv:'Sul América',hospId:'sl_morumbi',dataAtend:'2026-06-23',proc:'EDA + CLN + PB + M + H',hist:'',ap:true,interesse:false},
+      {id:'p_m0623_06',nome:'Aline Alves Rosendo',nasc:'1995-03-20',conv:'Bradesco',hospId:'sl_morumbi',dataAtend:'2026-06-23',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_m0623_07',nome:'Maria Neide Silva Sousa Oliveira',nasc:'1974-01-19',conv:'Particular',hospId:'sl_morumbi',dataAtend:'2026-06-23',proc:'CLN + PB',hist:'',ap:true,interesse:false},
+      {id:'p_m0623_08',nome:'Quelen Brito Dias',nasc:'1984-05-07',conv:'Bradesco',hospId:'sl_morumbi',dataAtend:'2026-06-23',proc:'EDA + CLN',hist:'',ap:true,interesse:false},
+      {id:'p_m0623_09',nome:'Andreia Maria Ribeiro',nasc:'1980-02-11',conv:'Sul América',hospId:'sl_morumbi',dataAtend:'2026-06-23',proc:'EDA + CLN',hist:'',ap:false,interesse:false},
+      {id:'p_m0623_10',nome:'Erika Glogauer Manzini Beglionini',nasc:'1983-02-07',conv:'Sul América',hospId:'sl_morumbi',dataAtend:'2026-06-23',proc:'EDA',hist:'',ap:false,interesse:false},
+      // ---- NIPO 24/06/2026 ----
+      {id:'p_n0624_01',nome:'Ana Maria da Silva',nasc:'1957-12-18',conv:'Sul América',hospId:'nipo',dataAtend:'2026-06-24',proc:'CLN',hist:'',ap:false,interesse:false},
+      {id:'p_n0624_02',nome:'Elizabeth de Oliveira F F Olivares',nasc:'1967-04-29',conv:'Seguros Unimed',hospId:'nipo',dataAtend:'2026-06-24',proc:'EDA + CLN + PA',hist:'',ap:false,interesse:false},
+      {id:'p_n0624_03',nome:'Christiane Auta do Nascimento',nasc:'1976-06-13',conv:'Sul América',hospId:'nipo',dataAtend:'2026-06-24',proc:'CLN',hist:'',ap:false,interesse:false},
+      {id:'p_n0624_04',nome:'Luzinete Guilherme de Lima Lifante',nasc:'1956-11-28',conv:'Notre Dame',hospId:'nipo',dataAtend:'2026-06-24',proc:'EDA + CLN + PA',hist:'',ap:false,interesse:false},
+      {id:'p_n0624_05',nome:'Thiago Alves de Souza',nasc:'1983-06-28',conv:'Mediservice',hospId:'nipo',dataAtend:'2026-06-24',proc:'CLN',hist:'',ap:false,interesse:false},
+      // ---- SL MORUMBI 16/06/2026 ----
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      // ---- SL MORUMBI 16/06/2026 ----
+      
+      
+      
+      
+      
+      
+      
+      
+      
     ],
     pagamentos: []
   };
