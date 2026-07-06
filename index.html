@@ -1075,19 +1075,29 @@ function renderFin() {
     db.servicos.forEach(s => {
       const ags = db.agenda.filter(a => a.comp === m && a.hospId === s.id);
       if (!ags.length) return;
-      const pB = ags.reduce((acc, a) => acc + a.brutoServico, 0);
-      const pL = ags.reduce((acc, a) => acc + a.liqFinal, 0);
+      let pB = ags.reduce((acc, a) => acc + a.brutoServico, 0);
+      let pL = ags.reduce((acc, a) => acc + a.liqFinal, 0);
+      let isEst = false;
+      // Auto-estimate for tabelado services
+      if ((pB === 0 || pL === 0) && ['sl_analia','sl_alpha','h9j'].includes(s.id)) {
+        const brutoEst = calcBrutoEstimado(s, m);
+        if (brutoEst > 0) {
+          const txEst = calcTributos(brutoEst, s.nf);
+          pB = brutoEst; pL = txEst.liquido; isEst = true;
+        }
+      }
       const pgto = db.pagamentos.find(p => p.comp === m && p.hospId === s.id);
-      rows.push({ comp: m, s, pB, pL, pgto });
+      rows.push({ comp: m, s, pB, pL, pgto, isEst });
     });
   });
   const tL = rows.reduce((s,r) => s+r.pL, 0);
   const tR = rows.filter(r=>r.pgto).reduce((s,r) => s+r.pgto.liquido, 0);
   const tP = rows.filter(r=>!r.pgto).reduce((s,r) => s+r.pL, 0);
+  const tEst = rows.filter(r=>r.isEst&&!r.pgto).reduce((s,r) => s+r.pL, 0);
   document.getElementById('fin-metrics').innerHTML = `
-    <div class="metric"><div class="metric-label">Líq. final registrado</div><div class="metric-value">${fmtV(tL)}</div><div class="metric-sub">após tributação</div></div>
+    <div class="metric"><div class="metric-label">Líq. final (c/ estimados)</div><div class="metric-value">${fmtV(tL)}</div><div class="metric-sub">após tributação</div></div>
     <div class="metric"><div class="metric-label">Recebido confirmado</div><div class="metric-value" style="color:var(--success)">${fmtV(tR)}</div></div>
-    <div class="metric"><div class="metric-label">Pendente</div><div class="metric-value" style="color:var(--warn)">${fmtV(tP)}</div></div>
+    <div class="metric"><div class="metric-label">Pendente</div><div class="metric-value" style="color:var(--warn)">${fmtV(tP)}</div><div class="metric-sub">${tEst>0?'incl. '+fmtV(tEst)+' estimado':''}</div></div>
     <div class="metric"><div class="metric-label">% recebido</div><div class="metric-value">${tL>0?Math.round(tR/tL*100):0}%</div></div>`;
   document.getElementById('tbody-fin').innerHTML = rows.map(r => {
     const tx = r.pgto?.tributos || {};
