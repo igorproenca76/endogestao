@@ -1082,8 +1082,15 @@ function renderFin() {
       if ((pB === 0 || pL === 0) && ['sl_analia','sl_alpha','h9j'].includes(s.id)) {
         const brutoEst = calcBrutoEstimado(s, m);
         if (brutoEst > 0) {
-          const txEst = calcTributos(brutoEst, s.nf);
-          pB = brutoEst; pL = txEst.liquido; isEst = true;
+          if (s.id === 'sl_alpha') {
+            // Alpha: sócio, sem NF. pB=bruto pré-desconto, pL=após desconto
+            const desc = m >= (s.desconto_inicio||'9999') ? s.desconto_atual : s.desconto_antigo;
+            pB = brutoEst; pL = r2(brutoEst * (1 - desc));
+          } else {
+            const txEst = calcTributos(brutoEst, s.nf);
+            pB = brutoEst; pL = txEst.liquido;
+          }
+          isEst = true;
         }
       }
       const pgto = db.pagamentos.find(p => p.comp === m && p.hospId === s.id);
@@ -1108,7 +1115,7 @@ function renderFin() {
     return `<tr class="${r.pgto?.glosa?'glosa-row':''}">
       <td style="font-weight:500">${fmtM(r.comp)}</td>
       <td><span class="svc-dot" style="background:${r.s.cor}"></span>${r.s.nome}</td>
-      <td style="font-size:11px">${r.pB>0?fmtV(r.pB)+'<span style="color:var(--text3);font-size:10px">${["sl_analia","sl_alpha","h9j"].includes(r.s.id)&&!r.pgto?" est":""}</span>':'—'}</td>
+      <td style="font-size:11px">${r.pB>0?fmtV(r.pB)+(r.isEst&&!r.pgto?' <span style="font-size:10px;color:var(--text3)">(est)</span>':''):'—'}</td>
       <td style="font-size:11px;color:var(--danger)">${tx.cofins?fmtV(tx.cofins):'—'}</td>
       <td style="font-size:11px;color:var(--danger)">${tx.pis?fmtV(tx.pis):'—'}</td>
       <td style="font-size:11px;color:var(--danger)">${tx.csl?fmtV(tx.csl):'—'}</td>
@@ -1370,7 +1377,8 @@ function calcBrutoEstimado(s, mes) {
       else if (/\bECO\b/i.test(proc)) bruto += s.tabela.eco || 750;
       if (/CPRE/i.test(proc)) bruto += s.tabela.cpreSprot || 905;
     });
-    bruto = bruto * (1 - desc); // aplica desconto sócio
+    // Para Alpha: retorna bruto pré-desconto; o desconto é aplicado como "NF" no renderFin
+    return r2(bruto); // bruto antes do desconto de sócio
   }
   return r2(bruto);
 }
