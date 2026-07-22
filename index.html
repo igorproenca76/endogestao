@@ -433,7 +433,7 @@ tr:hover td { background: rgba(0,0,0,0.02); }
 </div>
 
 <script>
-const KEY = 'endogestao_v1';
+const KEY = 'endogestao_v3';
 const CORES = { h9j: '#6e9bc8', nipo: '#7ab394', sl_analia: '#c8a96e', sl_alpha: '#b87ab3', sl_morumbi: '#c97d4e' };
 
 // Tributação PJ
@@ -486,6 +486,27 @@ const SERVICOS_CONFIG = [
     tabela: {},
     campos: ['eda','cln','pa','pb','mucose','hemostasia','anRts','sne','dilatacao'],
     obs: 'Produção variável por convênio. Delay: 2 meses. Fechamento: tabela com bruto/impostos + relação de pacientes.'
+  },
+  {
+    id: 'sl_itaim', nome: 'SL Itaim', cor: '#5B8DD9', delay: 2, nf: true,
+    periodoNoValor: false,
+    tabela: {},
+    campos: ['eda','cln','pa','pb','mucose','hemostasia','anRts','sne','dilatacao'],
+    obs: 'Idêntico ao SL Morumbi. Mesma empresa gestora. Produção variável por convênio. Delay: 2 meses. NF PJ.'
+  },
+  {
+    id: 'luz', nome: 'LUZ', cor: '#D4A017', delay: 2, nf: false,
+    periodoNoValor: false, luz_logica: true,
+    tabela: { eco: 700, periodo: 2000 },
+    campos: ['eco'],
+    obs: 'Apenas ECO. Lógica especial: ≤2 ECOs/período = R$2.000 fixo; ≥3 ECOs = R$700/exame. Dividendos sócio, sem NF. Delay: 2 meses (a confirmar).'
+  },
+  {
+    id: 'hvm', nome: 'HVM', cor: '#C85B8D', delay: 2, nf: true,
+    periodoNoValor: false,
+    tabela: { edaDiag: 135, edaTer: 185, clnDiag: 270, clnTer: 320, cpre: 1700 },
+    campos: ['edaDiag','edaTer','clnDiag','clnTer','cpre'],
+    obs: 'CPRE + EDA/CLN. Tabelado Diag/Ter como Anália. NF PJ. Delay: 2 meses (1º pagamento no 3º mês — contrato em aprovação).'
   }
 ];
 
@@ -615,6 +636,46 @@ function initDb() {
        periodos:1, brutoServico:0, liqFinal:0,
        proc:{edaDiag:1, clnDiag:1, eco:5},
        obs:'6 pac'},
+      // 14/07/2026 — SL Morumbi — 2 períodos
+      {id:'ag_m0714', hospId:'sl_morumbi', comp:'2026-07', data:'2026-07-14',
+       periodos:2, brutoServico:0, liqFinal:0,
+       proc:{eda:12, cln:6, pa:4, pb:1, an:1},
+       obs:'12 pac · An: Ricardo'},
+      // 15/07/2026 — NIPO — 2 períodos
+      {id:'ag_n0715', hospId:'nipo', comp:'2026-07', data:'2026-07-15',
+       periodos:2, brutoServico:0, liqFinal:0,
+       proc:{eda:8, cln:5, pxA:2, pxB:4},
+       obs:'13 pac · AP: Ivanildo'},
+      // 17/07/2026 — SL Anália — 1 período
+      {id:'ag_a0717', hospId:'sl_analia', comp:'2026-07', data:'2026-07-17',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{edaDiag:2, eco:4},
+       obs:'4 pac'},
+      // 20/07/2026 — SL Alpha — 1 período
+      {id:'ag_al0720', hospId:'sl_alpha', comp:'2026-07', data:'2026-07-20',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{eda:4, eco:4},
+       obs:'6 pac'},
+      // 20/07/2026 — HVM — 1 período
+      {id:'ag_hvm0720', hospId:'hvm', comp:'2026-07', data:'2026-07-20',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{edaDiag:1, edaTer:1, hemostasia:1},
+       obs:'2 pac · EDA Ter: Cleide (H)'},
+      // 21/07/2026 — NIPO — 2 períodos
+      {id:'ag_n0721', hospId:'nipo', comp:'2026-07', data:'2026-07-21',
+       periodos:2, brutoServico:0, liqFinal:0,
+       proc:{eda:13, cln:7, pxA:4, pxB:5},
+       obs:'15 pac · AP: Maria Eunice, Augusto, Guilherme'},
+      // 22/07/2026 — SL Itaim — 1 período
+      {id:'ag_it0722', hospId:'sl_itaim', comp:'2026-07', data:'2026-07-22',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{eda:4, cln:2, pa:2},
+       obs:'5 pac'},
+      // 22/07/2026 — LUZ — 1 período (1 ECO → R$2.000 fixo)
+      {id:'ag_luz0722', hospId:'luz', comp:'2026-07', data:'2026-07-22',
+       periodos:1, brutoServico:2000, liqFinal:2000,
+       proc:{eco:1},
+       obs:'1 pac · 1 ECO ≤2 → R$2.000 fixo'},
       // 15/06/2026 — H9J — 1 período + PA:2 + PB:1
       // Período cobre EDA+CLN; ECO/CPRE/procedimentos faturados separadamente
       {id:'ag_h0615', hospId:'h9j', comp:'2026-06', data:'2026-06-15',
@@ -778,6 +839,72 @@ function initDb() {
       {id:'p_a0710_04',nome:'Solange Palanch Zangirolami',nasc:'1952-01-18',conv:'Sul América',hospId:'sl_analia',dataAtend:'2026-07-10',proc:'ECO',hist:'',ap:false,interesse:false},
       {id:'p_a0710_05',nome:'Thiago Ojeda',nasc:'1984-03-06',conv:'Sul América',hospId:'sl_analia',dataAtend:'2026-07-10',proc:'ECO + CLN',hist:'',ap:false,interesse:false},
       {id:'p_a0710_06',nome:'Nathalya Silva Borsato',nasc:'2002-11-19',conv:'Bradesco',hospId:'sl_analia',dataAtend:'2026-07-10',proc:'ECO',hist:'',ap:false,interesse:false},
+      // ---- SL MORUMBI 14/07/2026 ----
+      {id:'p_m0714_01',nome:'Carlos Roberto Barbosa da Silva',nasc:'1989-07-03',conv:'Bradesco',hospId:'sl_morumbi',dataAtend:'2026-07-14',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_m0714_02',nome:'Karla Catherine Lameu da Rocha',nasc:'1975-06-30',conv:'Sul América',hospId:'sl_morumbi',dataAtend:'2026-07-14',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_m0714_03',nome:'Leilane Santos Daquino Serra',nasc:'1973-01-24',conv:'Sul América',hospId:'sl_morumbi',dataAtend:'2026-07-14',proc:'EDA + CLN + PB',hist:'',ap:false,interesse:false},
+      {id:'p_m0714_04',nome:'Robson de Oliveira',nasc:'1986-03-08',conv:'Bradesco',hospId:'sl_morumbi',dataAtend:'2026-07-14',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_m0714_05',nome:'Sueli Regina Libanori',nasc:'1962-07-25',conv:'Saúde Caixa',hospId:'sl_morumbi',dataAtend:'2026-07-14',proc:'EDA + CLN',hist:'',ap:false,interesse:false},
+      {id:'p_m0714_06',nome:'Isabella Dolder Amaral',nasc:'2001-10-01',conv:'Bradesco',hospId:'sl_morumbi',dataAtend:'2026-07-14',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_m0714_07',nome:'Brenda Anehi Salice Pereira Grigolon',nasc:'1993-03-26',conv:'Bradesco',hospId:'sl_morumbi',dataAtend:'2026-07-14',proc:'EDA + CLN',hist:'',ap:false,interesse:false},
+      {id:'p_m0714_08',nome:'Juliana Aparecida Fernandes',nasc:'1986-09-21',conv:'Bradesco',hospId:'sl_morumbi',dataAtend:'2026-07-14',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_m0714_09',nome:'Ricardo Beserra de Lima',nasc:'1980-12-05',conv:'Bradesco',hospId:'sl_morumbi',dataAtend:'2026-07-14',proc:'EDA + CLN + PA + An',hist:'',ap:false,interesse:false},
+      {id:'p_m0714_10',nome:'Everton Silva Baran',nasc:'1978-04-04',conv:'Sul América',hospId:'sl_morumbi',dataAtend:'2026-07-14',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_m0714_11',nome:'Claudio Roberto Alves Simon',nasc:'1969-08-17',conv:'Sul América',hospId:'sl_morumbi',dataAtend:'2026-07-14',proc:'EDA + CLN + PA',hist:'',ap:false,interesse:false},
+      {id:'p_m0714_12',nome:'Ana Maria Oliveira dos Santos',nasc:'1986-04-30',conv:'Sul América',hospId:'sl_morumbi',dataAtend:'2026-07-14',proc:'EDA + CLN',hist:'',ap:false,interesse:false},
+      // ---- NIPO 15/07/2026 ----
+      {id:'p_n0715_01',nome:'Mauro Janucci',nasc:'1971-08-07',conv:'Bradesco',hospId:'nipo',dataAtend:'2026-07-15',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0715_02',nome:'Taina Torquato Arioli',nasc:'1987-10-12',conv:'Central Nacional Unimed',hospId:'nipo',dataAtend:'2026-07-15',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0715_03',nome:'Kelly Cristina Maximo de Almeida',nasc:'1986-02-04',conv:'Bradesco',hospId:'nipo',dataAtend:'2026-07-15',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0715_04',nome:'Mario Santos da Silva',nasc:'1963-02-01',conv:'Postal Saúde',hospId:'nipo',dataAtend:'2026-07-15',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0715_05',nome:'Gabrielly Lima de Oliveira',nasc:'2000-06-01',conv:'Porto Saúde',hospId:'nipo',dataAtend:'2026-07-15',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_n0715_06',nome:'Alexandra Teles Vicente',nasc:'1972-02-09',conv:'Sul América',hospId:'nipo',dataAtend:'2026-07-15',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0715_07',nome:'Julianna dos Santos',nasc:'2003-11-12',conv:'Central Nacional Unimed',hospId:'nipo',dataAtend:'2026-07-15',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_n0715_08',nome:'Paula de Oliveira Dantas',nasc:'1991-03-19',conv:'Porto Saúde',hospId:'nipo',dataAtend:'2026-07-15',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0715_09',nome:'Maria da Candelaria Soares',nasc:'1946-01-26',conv:'Central Nacional Unimed',hospId:'nipo',dataAtend:'2026-07-15',proc:'CLN + PB',hist:'',ap:false,interesse:false},
+      {id:'p_n0715_10',nome:'Levi Pacheco Cordeiro',nasc:'1969-03-04',conv:'Notre Dame',hospId:'nipo',dataAtend:'2026-07-15',proc:'CLN + PB',hist:'',ap:false,interesse:false},
+      {id:'p_n0715_11',nome:'Samyra Santos Sant Anna',nasc:'2005-03-11',conv:'Postal Saúde',hospId:'nipo',dataAtend:'2026-07-15',proc:'CLN',hist:'',ap:false,interesse:false},
+      {id:'p_n0715_12',nome:'Stephani Atef Ezzedine',nasc:'2008-09-01',conv:'Porto Saúde',hospId:'nipo',dataAtend:'2026-07-15',proc:'CLN + PB',hist:'',ap:false,interesse:false},
+      {id:'p_n0715_13',nome:'Ivanildo Francisco da Silva Filho',nasc:'1963-11-07',conv:'Promocional',hospId:'nipo',dataAtend:'2026-07-15',proc:'CLN + PB',hist:'',ap:true,interesse:false},
+      // ---- SL ANÁLIA 17/07/2026 ----
+      {id:'p_a0717_01',nome:'Jeniffer Nusse Polinario',nasc:'1982-07-06',conv:'Sul América',hospId:'sl_analia',dataAtend:'2026-07-17',proc:'ECO',hist:'',ap:false,interesse:false},
+      {id:'p_a0717_02',nome:'Leonardo Oliva Kraciunas',nasc:'1986-11-14',conv:'Porto Saúde',hospId:'sl_analia',dataAtend:'2026-07-17',proc:'EDA + ECO',hist:'',ap:false,interesse:false},
+      {id:'p_a0717_03',nome:'Guilherme Antonelli Romeo',nasc:'2001-06-07',conv:'Bradesco',hospId:'sl_analia',dataAtend:'2026-07-17',proc:'ECO',hist:'',ap:false,interesse:false},
+      {id:'p_a0717_04',nome:'Mariane dos Santos Andrade',nasc:'1999-02-19',conv:'Bradesco',hospId:'sl_analia',dataAtend:'2026-07-17',proc:'EDA + ECO',hist:'',ap:false,interesse:false},
+      // ---- SL ALPHA 20/07/2026 ----
+      {id:'p_al0720_01',nome:'Lucas Rodrigues Augusto',nasc:'1991-05-04',conv:'Sul América',hospId:'sl_alpha',dataAtend:'2026-07-20',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_al0720_02',nome:'Lucicleide Pereira Belo',nasc:'1963-01-08',conv:'Sul América',hospId:'sl_alpha',dataAtend:'2026-07-20',proc:'ECO',hist:'',ap:false,interesse:false},
+      {id:'p_al0720_03',nome:'Gabriel da Silva Souza',nasc:'1997-09-02',conv:'Bradesco',hospId:'sl_alpha',dataAtend:'2026-07-20',proc:'EDA + ECO',hist:'',ap:false,interesse:false},
+      {id:'p_al0720_04',nome:'Rafael Maximo Junior',nasc:'2007-09-21',conv:'Sul América',hospId:'sl_alpha',dataAtend:'2026-07-20',proc:'EDA + ECO',hist:'',ap:false,interesse:false},
+      {id:'p_al0720_05',nome:'Claudio Roberto Frare',nasc:'1956-09-16',conv:'Sul América',hospId:'sl_alpha',dataAtend:'2026-07-20',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_al0720_06',nome:'Cristina Araujo do Prado',nasc:'1970-02-07',conv:'Sul América',hospId:'sl_alpha',dataAtend:'2026-07-20',proc:'ECO',hist:'',ap:false,interesse:false},
+      // ---- HVM 20/07/2026 ----
+      {id:'p_hvm0720_01',nome:'Cleide Milicio Cavalcante',nasc:'1956-05-30',conv:'',hospId:'hvm',dataAtend:'2026-07-20',proc:'EDA + H',hist:'EDA Terapêutica — Hemostasia',ap:false,interesse:false},
+      {id:'p_hvm0720_02',nome:'Carlos Roberto Fazzio',nasc:'1953-04-08',conv:'',hospId:'hvm',dataAtend:'2026-07-20',proc:'EDA',hist:'EDA Diagnóstica',ap:false,interesse:false},
+      // ---- NIPO 21/07/2026 ----
+      {id:'p_n0721_01',nome:'Mara dos Santos Silva Ribeiro',nasc:'1987-03-05',conv:'Bradesco',hospId:'nipo',dataAtend:'2026-07-21',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_n0721_02',nome:'Luceleni Euzebio Mendes',nasc:'1967-08-17',conv:'Bradesco',hospId:'nipo',dataAtend:'2026-07-21',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0721_03',nome:'Maria Eunice Pereira Ono',nasc:'1947-01-16',conv:'Notre Dame',hospId:'nipo',dataAtend:'2026-07-21',proc:'EDA',hist:'',ap:true,interesse:false},
+      {id:'p_n0721_04',nome:'Augusto Cazella Cordesque',nasc:'2009-07-22',conv:'Bradesco',hospId:'nipo',dataAtend:'2026-07-21',proc:'EDA',hist:'',ap:true,interesse:false},
+      {id:'p_n0721_05',nome:'Elisangela Goncalves Oliva',nasc:'1973-09-20',conv:'Porto Saúde',hospId:'nipo',dataAtend:'2026-07-21',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0721_06',nome:'Guilherme Henrique Britto Pavan',nasc:'1991-08-08',conv:'Notre Dame',hospId:'nipo',dataAtend:'2026-07-21',proc:'EDA',hist:'',ap:true,interesse:false},
+      {id:'p_n0721_07',nome:'Cintia Ribeiro Ferreira Franco',nasc:'1987-11-12',conv:'Sul América',hospId:'nipo',dataAtend:'2026-07-21',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_n0721_08',nome:'Edna Maria Marchi dos Santos',nasc:'1956-05-09',conv:'Porto Saúde',hospId:'nipo',dataAtend:'2026-07-21',proc:'CLN + PB',hist:'',ap:false,interesse:false},
+      {id:'p_n0721_09',nome:'Rainer Lourenco',nasc:'1991-08-21',conv:'Bradesco',hospId:'nipo',dataAtend:'2026-07-21',proc:'CLN',hist:'',ap:false,interesse:false},
+      {id:'p_n0721_10',nome:'William Montin',nasc:'1963-04-21',conv:'Seguros Unimed',hospId:'nipo',dataAtend:'2026-07-21',proc:'EDA + CLN + PA + PB',hist:'',ap:false,interesse:false},
+      {id:'p_n0721_11',nome:'Valdenice Nunes Miyamoto',nasc:'1970-03-10',conv:'Porto Saúde',hospId:'nipo',dataAtend:'2026-07-21',proc:'EDA + CLN + PB',hist:'',ap:false,interesse:false},
+      {id:'p_n0721_12',nome:'Maria de Fatima C Maranduba Bitt',nasc:'1968-03-29',conv:'Postal Saúde',hospId:'nipo',dataAtend:'2026-07-21',proc:'EDA + CLN + PB',hist:'',ap:false,interesse:false},
+      {id:'p_n0721_13',nome:'Jerffson Souza dos Santos',nasc:'1975-01-21',conv:'Notre Dame',hospId:'nipo',dataAtend:'2026-07-21',proc:'EDA + CLN',hist:'',ap:false,interesse:false},
+      {id:'p_n0721_14',nome:'Lucieny Sierra Moraes',nasc:'1992-02-01',conv:'Sul América',hospId:'nipo',dataAtend:'2026-07-21',proc:'EDA + CLN + PA + PB',hist:'',ap:false,interesse:false},
+      {id:'p_n0721_15',nome:'Solange Souza dos Santos Alves',nasc:'1976-11-03',conv:'Seguros Unimed',hospId:'nipo',dataAtend:'2026-07-21',proc:'EDA',hist:'',ap:false,interesse:false},
+      // ---- SL ITAIM 22/07/2026 ----
+      {id:'p_it0722_01',nome:'Emerson Geraldo Marangoni',nasc:'1972-12-10',conv:'Bradesco',hospId:'sl_itaim',dataAtend:'2026-07-22',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_it0722_02',nome:'Gabriella Ribeiro Barbosa',nasc:'1994-09-15',conv:'Sul América',hospId:'sl_itaim',dataAtend:'2026-07-22',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_it0722_03',nome:'Leonardo Rezende',nasc:'1976-11-26',conv:'Bradesco',hospId:'sl_itaim',dataAtend:'2026-07-22',proc:'CLN',hist:'',ap:false,interesse:false},
+      {id:'p_it0722_04',nome:'Anna Carolina Abud Magri',nasc:'2000-03-05',conv:'Sul América',hospId:'sl_itaim',dataAtend:'2026-07-22',proc:'EDA + CLN',hist:'',ap:false,interesse:false},
+      {id:'p_it0722_05',nome:'Anna Carolina Tonella Mingues',nasc:'1998-07-06',conv:'Sul América',hospId:'sl_itaim',dataAtend:'2026-07-22',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      // ---- LUZ 22/07/2026 ----
+      {id:'p_luz0722_01',nome:'Patrick Ferreira da Cruz',nasc:'1993-11-16',conv:'Amil',hospId:'luz',dataAtend:'2026-07-22',proc:'ECO',hist:'',ap:false,interesse:false},
       // ---- SL MORUMBI 16/06/2026 ----
       
       
@@ -980,7 +1107,7 @@ function savePac() {
 }
 
 const EXAME_KEYS = ['EDA','CLN','ECO','CPRE'];
-const PROC_KEYS = ['PA','PB','M','H','Punção','CE','SNE'];
+const PROC_KEYS = ['PA','PB','M','H','Punção','CE','SNE','An'];
 const PROC_TER = ['PA','PB','M','H']; // procedimentos que tornam EDA/CLN terapêuticos
 
 // Para SL Anália: classifica EDA/CLN como Diagnóstica ou Terapêutica
@@ -1014,7 +1141,7 @@ function analiaCalcBruto(pacs) {
 
 function splitExames(proc, hospId) {
   if (!proc) return '—';
-  if (hospId === 'sl_analia') {
+  if (hospId === 'sl_analia' || hospId === 'hvm') {
     const t = analiaTipos(proc);
     const tags = [];
     if (t.edaDiag) tags.push('<span class="tag" style="color:var(--accent)">EDA Diag</span>');
@@ -1129,13 +1256,14 @@ function renderFin() {
       let pL = ags.reduce((acc, a) => acc + a.liqFinal, 0);
       let isEst = false;
       // Auto-estimate for tabelado services
-      if ((pB === 0 || pL === 0) && ['sl_analia','sl_alpha','h9j'].includes(s.id)) {
+      if ((pB === 0 || pL === 0) && ['sl_analia','sl_alpha','h9j','hvm','luz'].includes(s.id)) {
         const brutoEst = calcBrutoEstimado(s, m);
         if (brutoEst > 0) {
           if (s.id === 'sl_alpha') {
-            // Alpha: sócio, sem NF. pB=bruto pré-desconto, pL=após desconto
             const desc = m >= (s.desconto_inicio||'9999') ? s.desconto_atual : s.desconto_antigo;
             pB = brutoEst; pL = r2(brutoEst * (1 - desc));
+          } else if (s.id === 'luz') {
+            pB = brutoEst; pL = brutoEst;
           } else {
             const txEst = calcTributos(brutoEst, s.nf);
             pB = brutoEst; pL = txEst.liquido;
@@ -1163,21 +1291,20 @@ function renderFin() {
       ? `<span class="badge b-green">✓ Recebido</span>`
       : `<span class="badge b-red">Pendente</span>`;
     return `<tr class="${r.pgto?.glosa?'glosa-row':''}">
-      <td style="font-weight:500">${fmtM(r.comp)}</td>
+      <td style="font-weight:500">${r.pgto?fmtM(r.pgto.data?.slice(0,7)):fmtM(prev)}</td>
       <td><span class="svc-dot" style="background:${r.s.cor}"></span>${r.s.nome}</td>
+      <td style="font-size:11px">${fmtM(r.comp)}<br><span class="nota">${(()=>{const p=db.agenda.filter(a=>a.hospId===r.s.id&&a.comp===r.comp);const per=p.reduce((a,b)=>a+(b.periodos||0),0);return per?per+' per.':''})()}</span></td>
       <td style="font-size:11px">${r.pB>0?fmtV(r.pB)+(r.isEst&&!r.pgto?' <span style="font-size:10px;color:var(--text3)">(est)</span>':''):'—'}</td>
       <td style="font-size:11px;color:var(--danger)">${tx.cofins?fmtV(tx.cofins):'—'}</td>
       <td style="font-size:11px;color:var(--danger)">${tx.pis?fmtV(tx.pis):'—'}</td>
       <td style="font-size:11px;color:var(--danger)">${tx.csl?fmtV(tx.csl):'—'}</td>
       <td style="font-size:11px;color:var(--danger)">${tx.irrf?fmtV(tx.irrf):'—'}</td>
       <td style="font-size:11px;color:var(--danger)">${r.pgto?.glosa?`−${fmtV(r.pgto.glosa)}`:'—'}</td>
-      <td style="font-weight:500;color:${r.pL>0?'var(--success)':'var(--text3)'}">${r.pL>0?fmtV(r.pL):'a calcular'}</td>
-      <td style="font-size:11px">${r.pgto?fmtD(r.pgto.data):'—'}</td>
-      <td style="font-size:11px;color:var(--text3)">${r.pgto?'':fmtM(prev)}</td>
+      <td style="font-weight:500;color:${r.pL>0?'var(--success)':'var(--text3)'}">${r.pL>0?fmtV(r.pL):`<span style="color:var(--text3)">a calcular</span>`}</td>
+      <td style="font-size:12px">${r.pgto?fmtD(r.pgto.data):'—'}</td>
       <td>${status}</td>
       <td>${r.pgto?`<button class="btn btn-danger btn-sm" onclick="delPgto('${r.pgto.id}')">✕</button>`:''}</td>
-    </tr>`;
-  }).join('');
+    </tr>`  }).join('');
 }
 
 // ---- SERVIÇOS ----
@@ -1227,11 +1354,37 @@ function renderDash() {
     return acc + EXAME_KEYS.filter(e => new RegExp('\\b'+e+'\\b','i').test(proc)).length;
   }, 0);
 
+  const totalRecebido = db.pagamentos.reduce((s,p) => s+(p.liquido||0), 0);
+  const totalPendente = (() => {
+    const meses = [...new Set(db.agenda.map(a => a.comp))];
+    let pend = 0;
+    meses.forEach(m => {
+      db.servicos.forEach(sv => {
+        const ags = db.agenda.filter(a => a.comp === m && a.hospId === sv.id);
+        if (!ags.length) return;
+        const pgto = db.pagamentos.find(p => p.comp === m && p.hospId === sv.id);
+        if (!pgto) {
+          let pL = ags.reduce((acc,a) => acc+a.liqFinal, 0);
+          if ((pL===0) && ['sl_analia','sl_alpha','h9j'].includes(sv.id)) {
+            const brutoEst = calcBrutoEstimado(sv, m);
+            if (brutoEst > 0) {
+              if (sv.id==='sl_alpha') { const d=m>=(sv.desconto_inicio||'9999')?sv.desconto_atual:sv.desconto_antigo; pL=r2(brutoEst*(1-d)); }
+              else { pL = calcTributos(brutoEst, sv.nf).liquido; }
+            }
+          }
+          pend += pL;
+        }
+      });
+    });
+    return pend;
+  })();
+
   document.getElementById('dash-metrics').innerHTML = `
     <div class="metric"><div class="metric-label">Líq. final ${fmtM(mesRef)}</div><div class="metric-value">${lRef>0?fmtV(lRef):'—'}</div><div class="metric-sub">${mesAnt?fmtV(lAnt)+' em '+fmtM(mesAnt):''}</div></div>
+    <div class="metric"><div class="metric-label">Total recebido</div><div class="metric-value" style="color:var(--success)">${fmtV(totalRecebido)}</div><div class="metric-sub">todos os meses</div></div>
     <div class="metric"><div class="metric-label">Pacientes ${fmtM(mesRef)}</div><div class="metric-value">${pacsRef.length||'—'}</div><div class="metric-sub">${db.pacientes.length} total desde jun</div></div>
-    <div class="metric"><div class="metric-label">Exames ${fmtM(mesRef)}</div><div class="metric-value">${examesRef||'—'}</div><div class="metric-sub">EDA · CLN · ECO · CPRE</div></div>
-    <div class="metric"><div class="metric-label">Serviços</div><div class="metric-value">${db.servicos.length}</div></div>
+    <div class="metric"><div class="metric-label">Recebido total</div><div class="metric-value" style="color:var(--success)">${fmtV(totalRecebido)}</div><div class="metric-sub">todos os serviços</div></div>
+    <div class="metric"><div class="metric-label">Pendente/estimado</div><div class="metric-value" style="color:var(--warn)">${fmtV(totalPendente)}</div></div>
     <div class="metric"><div class="metric-label">AP pendente</div><div class="metric-value" style="color:${apCount>0?'var(--warn)':'var(--text3)'}">${apCount}</div></div>`;
 
   // barras
@@ -1369,19 +1522,28 @@ function renderDash() {
   }
 
   document.getElementById('tbody-resumo').innerHTML = meses.length ? meses.map(m => {
-    const vals = db.servicos.map(s => db.agenda.filter(a => a.hospId === s.id && a.comp === m).reduce((acc,a) => acc+a.liqFinal, 0));
+    const vals = db.servicos.map(s => {
+      // Prefer confirmed payment liquido, fallback to agenda liqFinal estimate
+      const pgto = db.pagamentos.find(p => p.comp === m && p.hospId === s.id);
+      if (pgto) return pgto.liquido;
+      const agLiq = db.agenda.filter(a => a.hospId === s.id && a.comp === m).reduce((acc,a) => acc+a.liqFinal, 0);
+      // For tabelado services, use estimated if no agenda value
+      if (!agLiq && ['sl_analia','sl_alpha','h9j'].includes(s.id)) return calcBrutoEstimado(s, m) > 0 ? calcTributos(calcBrutoEstimado(s,m),s.nf).liquido : 0;
+      return agLiq;
+    });
     const total = vals.reduce((s,v) => s+v, 0);
-    return `<tr>
-      <td style="font-weight:500">${fmtM(m)}</td>
+    const hasConfirmed = db.servicos.some(s => db.pagamentos.find(p => p.comp === m && p.hospId === s.id));
+    return `<tr${hasConfirmed?' style="background:color-mix(in srgb,var(--success) 5%,transparent)"':''}>
+      <td style="font-weight:500">${fmtM(m)}${hasConfirmed?' <span style="font-size:10px;color:var(--success)">✓</span>':''}</td>
       ${vals.map(v => `<td style="font-size:11px;color:${v>0?'var(--text)':'var(--text3)'}">${v>0?fmtV(v):'—'}</td>`).join('')}
       <td style="font-weight:500;color:var(--accent)">${fmtV(total)}</td>
     </tr>`;
-  }).join('') : `<tr><td colspan="7" class="empty" style="padding:20px">Dados aparecerão aqui conforme você registrar as agendas</td></tr>`;
+  }).join('') : `<tr><td colspan="10" class="empty" style="padding:20px">Dados aparecerão aqui conforme você registrar as agendas</td></tr>`;
 }
 
 function calcBrutoEstimado(s, mes) {
   // Only for tabelado/misto-tabela services: SL Anália, SL Alpha, H9J
-  if (!['sl_analia','sl_alpha','h9j'].includes(s.id)) return 0;
+  if (!['sl_analia','sl_alpha','h9j','hvm','luz'].includes(s.id)) return 0;
   const pacs = db.pacientes.filter(p => p.hospId === s.id && p.dataAtend?.startsWith(mes));
   const ags = db.agenda.filter(a => a.hospId === s.id && a.comp === mes);
   const periodos = ags.reduce((acc,a) => acc+(a.periodos||0), 0);
@@ -1412,6 +1574,15 @@ function calcBrutoEstimado(s, mes) {
       else if (/\bECO\b/i.test(proc)) bruto += s.tabela.eco || 500;
       if (/\bCPRE\b/i.test(proc)) bruto += s.tabela.cpre || 550;
     });
+  } else if (s.id === 'hvm') {
+    pacs.forEach(p => {
+      const t = analiaTipos(p.proc || '');
+      bruto += t.edaDiag * (s.tabela.edaDiag || 135);
+      bruto += t.edaTer  * (s.tabela.edaTer  || 185);
+      bruto += t.clnDiag * (s.tabela.clnDiag || 270);
+      bruto += t.clnTer  * (s.tabela.clnTer  || 320);
+      if (/\bCPRE\b/i.test(p.proc||'')) bruto += s.tabela.cpre || 1700;
+    });
   } else if (s.id === 'sl_alpha') {
     // Período + procedimentos, com desconto
     const comp = mes;
@@ -1429,6 +1600,10 @@ function calcBrutoEstimado(s, mes) {
     });
     // Para Alpha: retorna bruto pré-desconto; o desconto é aplicado como "NF" no renderFin
     return r2(bruto); // bruto antes do desconto de sócio
+  } else if (s.id === 'luz') {
+    const nEco = pacs.filter(p => /\bECO\b/i.test(p.proc||'')).length;
+    const nPer = db.agenda.filter(a => a.hospId === 'luz' && a.comp === mes).reduce((a,b) => a+(b.periodos||0), 0);
+    bruto = nEco >= 3 ? nEco * 700 : nPer * 2000;
   }
   return r2(bruto);
 }
