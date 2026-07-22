@@ -1722,6 +1722,77 @@ function exportExcel() {
     XLSX.utils.book_append_sheet(wb, ws, s.nome.slice(0,31));
   });
 
+  // ---- ABA RESUMO ----
+  const resumoRows = [
+    ['RESUMO — ' + fmtM(mes)],
+    [],
+    ['Serviço', 'Períodos', 'Bruto estimado (R$)', 'Líquido estimado (R$)', 'Observação'],
+  ];
+
+  db.servicos.forEach(s => {
+    const ags = db.agenda.filter(a => a.hospId === s.id && a.comp === mes);
+    if (!ags.length) return;
+    const periodos = ags.reduce((acc, a) => acc + (a.periodos||0), 0);
+    const pacs = db.pacientes.filter(p => p.hospId === s.id && p.dataAtend?.startsWith(mes));
+
+    let brutoEst = 0, liqEst = 0, obs = '';
+
+    if (['sl_analia','sl_alpha','h9j','hvm','luz'].includes(s.id)) {
+      brutoEst = calcBrutoEstimado(s, mes);
+      if (s.id === 'sl_alpha') {
+        const desc = mes >= (s.desconto_inicio||'9999') ? s.desconto_atual : s.desconto_antigo;
+        liqEst = r2(brutoEst * (1 - desc));
+        obs = `Desconto sócio ${(desc*100).toFixed(0)}% — sem NF`;
+      } else if (s.id === 'luz') {
+        liqEst = brutoEst;
+        const nEco = pacs.filter(p => /ECO/i.test(p.proc||'')).length;
+        obs = nEco >= 3 ? `${nEco} ECOs × R$700` : `${periodos} período(s) × R$2.000 (≤2 ECOs)`;
+      } else {
+        const tx = calcTributos(brutoEst, s.nf);
+        liqEst = tx.liquido;
+        obs = `NF PJ — ${(TX_EFETIVO*100).toFixed(2)}% tributos`;
+      }
+    } else {
+      obs = 'Variável por convênio — aguardar fechamento';
+    }
+
+    resumoRows.push([
+      s.nome,
+      periodos,
+      brutoEst > 0 ? brutoEst : '—',
+      liqEst > 0 ? liqEst : '—',
+      obs
+    ]);
+  });
+
+  resumoRows.push([]);
+  // Totals for estimable services
+  const totalBruto = db.servicos
+    .filter(s => ['sl_analia','sl_alpha','h9j','hvm','luz'].includes(s.id))
+    .reduce((acc, s) => {
+      if (!db.agenda.some(a => a.hospId === s.id && a.comp === mes)) return acc;
+      return acc + calcBrutoEstimado(s, mes);
+    }, 0);
+  const totalLiq = db.servicos
+    .filter(s => ['sl_analia','sl_alpha','h9j','hvm','luz'].includes(s.id))
+    .reduce((acc, s) => {
+      if (!db.agenda.some(a => a.hospId === s.id && a.comp === mes)) return acc;
+      const b = calcBrutoEstimado(s, mes);
+      if (s.id === 'sl_alpha') {
+        const desc = mes >= (s.desconto_inicio||'9999') ? s.desconto_atual : s.desconto_antigo;
+        return acc + r2(b * (1-desc));
+      }
+      if (s.id === 'luz') return acc + b;
+      return acc + calcTributos(b, s.nf).liquido;
+    }, 0);
+
+  resumoRows.push(['TOTAL ESTIMADO (serviços tabelados)', '', r2(totalBruto), r2(totalLiq), 'NIPO e Morumbi excluídos (variável)']);
+  resumoRows.push(['', '', '', '', 'Valores estimados — sujeitos a ajuste no fechamento']);
+
+  const wsResumo = XLSX.utils.aoa_to_sheet(resumoRows);
+  wsResumo['!cols'] = [{wch:18},{wch:10},{wch:22},{wch:22},{wch:45}];
+  XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo');
+
   if (wb.SheetNames.length === 0) return alert('Nenhum paciente encontrado para ' + fmtM(mes));
   XLSX.writeFile(wb, `EndoGestao_${mes}.xlsx`);
 }
