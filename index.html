@@ -676,6 +676,16 @@ function initDb() {
        periodos:1, brutoServico:2000, liqFinal:2000,
        proc:{eco:1},
        obs:'1 pac · 1 ECO ≤2 → R$2.000 fixo'},
+      // 24/07/2026 — SL Anália — 1 período
+      {id:'ag_a0724', hospId:'sl_analia', comp:'2026-07', data:'2026-07-24',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{edaDiag:2, eco:2},
+       obs:'4 pac'},
+      // 25/07/2026 — NIPO — 1 período
+      {id:'ag_n0725', hospId:'nipo', comp:'2026-07', data:'2026-07-25',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{eda:7, pxA:3},
+       obs:'7 pac'},
       // 15/06/2026 — H9J — 1 período + PA:2 + PB:1
       // Período cobre EDA+CLN; ECO/CPRE/procedimentos faturados separadamente
       {id:'ag_h0615', hospId:'h9j', comp:'2026-06', data:'2026-06-15',
@@ -905,6 +915,19 @@ function initDb() {
       {id:'p_it0722_05',nome:'Anna Carolina Tonella Mingues',nasc:'1998-07-06',conv:'Sul América',hospId:'sl_itaim',dataAtend:'2026-07-22',proc:'EDA + PA',hist:'',ap:false,interesse:false},
       // ---- LUZ 22/07/2026 ----
       {id:'p_luz0722_01',nome:'Patrick Ferreira da Cruz',nasc:'1993-11-16',conv:'Amil',hospId:'luz',dataAtend:'2026-07-22',proc:'ECO',hist:'',ap:false,interesse:false},
+      // ---- SL ANÁLIA 24/07/2026 ----
+      {id:'p_a0724_01',nome:'Bianca Harue Costa Silva',nasc:'1996-03-17',conv:'Bradesco',hospId:'sl_analia',dataAtend:'2026-07-24',proc:'ECO',hist:'',ap:false,interesse:false},
+      {id:'p_a0724_02',nome:'Silmara Maia da Silva',nasc:'1987-10-17',conv:'Notre Dame',hospId:'sl_analia',dataAtend:'2026-07-24',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_a0724_03',nome:'Cilene da Luz Figueiredo',nasc:'1985-10-19',conv:'Sul América',hospId:'sl_analia',dataAtend:'2026-07-24',proc:'ECO',hist:'',ap:false,interesse:false},
+      {id:'p_a0724_04',nome:'Nathalia Rodrigues Martins',nasc:'1996-08-31',conv:'Bradesco',hospId:'sl_analia',dataAtend:'2026-07-24',proc:'EDA',hist:'',ap:false,interesse:false},
+      // ---- NIPO 25/07/2026 ----
+      {id:'p_n0725_01',nome:'Manoel Pedro da Silva Filho',nasc:'1965-12-16',conv:'Bradesco',hospId:'nipo',dataAtend:'2026-07-25',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0725_02',nome:'Matheus de Souza',nasc:'1990-12-18',conv:'Sul América',hospId:'nipo',dataAtend:'2026-07-25',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_n0725_03',nome:'Leandro Aparecido Izaias',nasc:'1987-05-23',conv:'Bradesco',hospId:'nipo',dataAtend:'2026-07-25',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0725_04',nome:'Matheus Moreira Barrios',nasc:'2006-05-05',conv:'Central Nacional Unimed',hospId:'nipo',dataAtend:'2026-07-25',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0725_05',nome:'Maria Jose Alves Cordeiro de Jesus',nasc:'1964-08-01',conv:'Seguros Unimed',hospId:'nipo',dataAtend:'2026-07-25',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_n0725_06',nome:'Maria de Fatima Gonsalo de Lima',nasc:'1981-05-27',conv:'Porto Saúde',hospId:'nipo',dataAtend:'2026-07-25',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_n0725_07',nome:'Eliane Fernandes Costa Bekcivanyi',nasc:'1956-02-22',conv:'GEAP',hospId:'nipo',dataAtend:'2026-07-25',proc:'EDA',hist:'',ap:false,interesse:false},
       // ---- SL MORUMBI 16/06/2026 ----
       
       
