@@ -391,7 +391,12 @@ tr:hover td { background: rgba(0,0,0,0.02); }
 <div id="screen-financeiro" class="screen">
   <div class="section-header">
     <h2>Financeiro</h2>
-    <button class="btn btn-primary" onclick="showForm('form-pgto')">+ Registrar pagamento</button>
+    <div style="display:flex;gap:8px;align-items:center">
+      <select id="f-fin-mes" onchange="renderFin()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:'DM Mono',monospace;font-size:12px;padding:6px 10px;border-radius:4px;outline:none">
+        <option value="">Todos os meses</option>
+      </select>
+      <button class="btn btn-primary" onclick="showForm('form-pgto')">+ Registrar pagamento</button>
+    </div>
   </div>
   <div id="form-pgto" style="display:none">
     <div class="card">
@@ -1269,7 +1274,23 @@ function delPgto(id) { if (!confirm('Remover?')) return; db.pagamentos = db.paga
 
 function renderFin() {
   populateSel('pg-hosp');
-  const meses = [...new Set(db.agenda.map(a => a.comp))].sort().reverse();
+  // Populate month filter — include months from both agenda and pagamentos
+  const smFin = document.getElementById('f-fin-mes');
+  if (smFin) {
+    const curFin = smFin.value;
+    while (smFin.options.length > 1) smFin.remove(1);
+    const allMeses = [...new Set([
+      ...db.agenda.map(a => a.comp),
+      ...db.pagamentos.map(p => p.comp)
+    ])].sort().reverse();
+    allMeses.forEach(m => smFin.add(new Option(fmtM(m), m)));
+    if (curFin) smFin.value = curFin;
+  }
+  const finMesFil = document.getElementById('f-fin-mes')?.value || '';
+  const meses = [...new Set([
+    ...db.agenda.map(a => a.comp),
+    ...db.pagamentos.map(p => p.comp)
+  ])].filter(m => !finMesFil || m === finMesFil).sort().reverse();
   const rows = [];
   meses.forEach(m => {
     db.servicos.forEach(s => {
@@ -1314,9 +1335,9 @@ function renderFin() {
       ? `<span class="badge b-green">✓ Recebido</span>`
       : `<span class="badge b-red">Pendente</span>`;
     return `<tr class="${r.pgto?.glosa?'glosa-row':''}">
-      <td style="font-weight:500">${r.pgto?fmtM(r.pgto.data?.slice(0,7)):fmtM(prev)}</td>
+      <td style="font-weight:500">${fmtM(r.comp)}<br><span class="nota" style="font-size:10px">${(()=>{const p=db.agenda.filter(a=>a.hospId===r.s.id&&a.comp===r.comp);const per=p.reduce((a,b)=>a+(b.periodos||0),0);return per?per+' per.':''})()}</span></td>
       <td><span class="svc-dot" style="background:${r.s.cor}"></span>${r.s.nome}</td>
-      <td style="font-size:11px">${fmtM(r.comp)}<br><span class="nota">${(()=>{const p=db.agenda.filter(a=>a.hospId===r.s.id&&a.comp===r.comp);const per=p.reduce((a,b)=>a+(b.periodos||0),0);return per?per+' per.':''})()}</span></td>
+      <td style="font-size:11px">${r.pgto?fmtD(r.pgto.data):fmtM(prev)}</td>
       <td style="font-size:11px">${r.pB>0?fmtV(r.pB)+(r.isEst&&!r.pgto?' <span style="font-size:10px;color:var(--text3)">(est)</span>':''):'—'}</td>
       <td style="font-size:11px;color:var(--danger)">${tx.cofins?fmtV(tx.cofins):'—'}</td>
       <td style="font-size:11px;color:var(--danger)">${tx.pis?fmtV(tx.pis):'—'}</td>
@@ -1324,7 +1345,6 @@ function renderFin() {
       <td style="font-size:11px;color:var(--danger)">${tx.irrf?fmtV(tx.irrf):'—'}</td>
       <td style="font-size:11px;color:var(--danger)">${r.pgto?.glosa?`−${fmtV(r.pgto.glosa)}`:'—'}</td>
       <td style="font-weight:500;color:${r.pL>0?'var(--success)':'var(--text3)'}">${r.pL>0?fmtV(r.pL):`<span style="color:var(--text3)">a calcular</span>`}</td>
-      <td style="font-size:12px">${r.pgto?fmtD(r.pgto.data):'—'}</td>
       <td>${status}</td>
       <td>${r.pgto?`<button class="btn btn-danger btn-sm" onclick="delPgto('${r.pgto.id}')">✕</button>`:''}</td>
     </tr>`  }).join('');
