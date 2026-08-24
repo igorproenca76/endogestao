@@ -502,9 +502,9 @@ const SERVICOS_CONFIG = [
   {
     id: 'luz', nome: 'LUZ', cor: '#D4A017', delay: 2, nf: false,
     periodoNoValor: false, luz_logica: true,
-    tabela: { eco: 700, periodo: 2000 },
-    campos: ['eco'],
-    obs: 'Apenas ECO. Lógica especial: ≤2 ECOs/período = R$2.000 fixo; ≥3 ECOs = R$700/exame. Dividendos sócio, sem NF. Delay: 2 meses (a confirmar).'
+    tabela: { eco: 700, ecoPunc: 900, periodo: 2000, punc: 200 },
+    campos: ['eco','ecoPunc'],
+    obs: 'Apenas ECO. Lógica especial: ≤2 ECOs/período = R$2.000 fixo; ≥3 ECOs = R$700/exame (R$900 se com punção, +R$200). Dividendos sócio, sem NF. Delay: 2 meses (a confirmar).'
   },
   {
     id: 'hvm', nome: 'HVM', cor: '#C85B8D', delay: 2, nf: true,
@@ -512,6 +512,13 @@ const SERVICOS_CONFIG = [
     tabela: { edaDiag: 135, edaTer: 185, clnDiag: 270, clnTer: 320, cpre: 1700 },
     campos: ['edaDiag','edaTer','clnDiag','clnTer','cpre'],
     obs: 'CPRE + EDA/CLN. Tabelado Diag/Ter como Anália. NF PJ. Delay: 2 meses (1º pagamento no 3º mês — contrato em aprovação).'
+  },
+  {
+    id: 'paulistano', nome: 'Hospital Paulistano (avulso)', cor: '#8A8A8A', delay: 2, nf: false,
+    periodoNoValor: false, luz_logica: true,
+    tabela: { eco: 700, ecoPunc: 900, periodo: 2000, punc: 200 },
+    campos: ['eco','ecoPunc'],
+    obs: 'Serviço avulso de cobertura (não habitual). Mesma lógica/tabela do LUZ: ≤2 ECOs/período = R$2.000 fixo; ≥3 ECOs = R$700/exame (R$900 c/ punção).'
   }
 ];
 
@@ -731,6 +738,96 @@ function initDb() {
       
       // 16/06/2026 — SL Morumbi — 2 períodos
       
+      // 01/08/2026 — NIPO — 2 períodos
+      {id:'ag_n0801', hospId:'nipo', comp:'2026-08', data:'2026-08-01',
+       periodos:2, brutoServico:0, liqFinal:0,
+       proc:{eda:11, cln:4, pxA:4, pxB:2, mucose:1},
+       obs:'12 pac · AP: Kimiyo, Francisco, Susana'},
+      // 03/08/2026 — SL Alpha — 1 período
+      {id:'ag_al0803', hospId:'sl_alpha', comp:'2026-08', data:'2026-08-03',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{eda:3, cln:2, poliA:2, poliB:1, mucose:1, hemColon:1, eco:2},
+       obs:'3 pac · sem AP'},
+      // 03/08/2026 — HVM — 1 período
+      {id:'ag_hvm0803', hospId:'hvm', comp:'2026-08', data:'2026-08-03',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{cpre:3},
+       obs:'3 pac · 3 CPRE × R$1.700 = R$5.100 bruto · sem AP'},
+      // 04/08/2026 — NIPO — 2 períodos
+      {id:'ag_n0804', hospId:'nipo', comp:'2026-08', data:'2026-08-04',
+       periodos:2, brutoServico:0, liqFinal:0,
+       proc:{eda:12, cln:6, pxA:5, pxB:1, eco:1},
+       obs:'16 pac · AP: Marcos Augusto Ferreira, Valmir Pereira de Oliveira'},
+      // 05/08/2026 — SL Itaim — 1 período
+      {id:'ag_it0805', hospId:'sl_itaim', comp:'2026-08', data:'2026-08-05',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{eda:6, cln:1, pa:1, pb:1},
+       obs:'6 pac · AP: Cirlei Cruz dos Santos'},
+      // 05/08/2026 — LUZ — 1 período (3 ECOs ≥3 → R$700/exame, 1 com punção +R$200)
+      {id:'ag_luz0805', hospId:'luz', comp:'2026-08', data:'2026-08-05',
+       periodos:1, brutoServico:2300, liqFinal:2300,
+       proc:{eco:3, ecoPunc:1},
+       obs:'3 pac · 3 ECOs (1 c/ punção) → R$700+R$700+R$900 = R$2.300'},
+      // 07/08/2026 — SL Anália — 1 período
+      {id:'ag_a0807', hospId:'sl_analia', comp:'2026-08', data:'2026-08-07',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{edaDiag:3, edaTer:1, clnDiag:2, clnTer:1, eco:6},
+       obs:'6 pac · sem AP'},
+      // 10/08/2026 — HVM — 1 período
+      {id:'ag_hvm0810', hospId:'hvm', comp:'2026-08', data:'2026-08-10',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{cpre:3},
+       obs:'3 pac · 3 CPRE × R$1.700 = R$5.100 bruto · sem AP'},
+      // 10/08/2026 — Hospital Paulistano (avulso, cobertura) — 1 período
+      {id:'ag_paul0810', hospId:'paulistano', comp:'2026-08', data:'2026-08-10',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{eco:5},
+       obs:'5 pac · cobertura avulsa (não habitual) · 5 ECOs × R$700 = R$3.500 · sem AP'},
+      // 11/08/2026 — NIPO — 2 períodos
+      {id:'ag_n0811', hospId:'nipo', comp:'2026-08', data:'2026-08-11',
+       periodos:2, brutoServico:0, liqFinal:0,
+       proc:{eda:10, cln:5, pxA:4, pxB:2, mucose:1},
+       obs:'11 pac · AP: Patricia Antunes de Campos, Maria de Fatima Rosa de Lima Silva, Kleber Eustaquio da Silva'},
+      // 12/08/2026 — SL Itaim — 1 período
+      {id:'ag_it0812', hospId:'sl_itaim', comp:'2026-08', data:'2026-08-12',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{eda:5, cln:2, pa:3, pb:1},
+       obs:'5 pac · sem AP'},
+      // 12/08/2026 — LUZ — 1 período
+      {id:'ag_luz0812', hospId:'luz', comp:'2026-08', data:'2026-08-12',
+       periodos:1, brutoServico:3700, liqFinal:3700,
+       proc:{eco:4, ecoPunc:1},
+       obs:'5 pac · 4 ECOs × R$700 + 1 ECO c/ Punção × R$900 = R$3.700'},
+      // 14/08/2026 — SL Anália — 1 período
+      {id:'ag_a0814', hospId:'sl_analia', comp:'2026-08', data:'2026-08-14',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{edaDiag:1, edaTer:2, clnDiag:1, eco:4},
+       obs:'4 pac · AP: Gabriela Pepe Marques'},
+      // 17/08/2026 — SL Alpha — 1 período
+      {id:'ag_al0817', hospId:'sl_alpha', comp:'2026-08', data:'2026-08-17',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{eco:1, cln:2, poliA:1, poliB:2, hemColon:1, retosig:1},
+       obs:'5 pac · sem AP'},
+      // 17/08/2026 — HVM — 1 período
+      {id:'ag_hvm0817', hospId:'hvm', comp:'2026-08', data:'2026-08-17',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{cpre:3},
+       obs:'3 pac · 3 CPRE × R$1.700 = R$5.100 bruto · sem AP'},
+      // 18/08/2026 — NIPO — 2 períodos
+      {id:'ag_n0818', hospId:'nipo', comp:'2026-08', data:'2026-08-18',
+       periodos:2, brutoServico:0, liqFinal:0,
+       proc:{eda:7, cln:4, pxA:2, pxB:2, sne:1},
+       obs:'8 pac · AP: Ednaide Guedes da Silva, Josivania Soares de Lima, Alysson Noriyuki Kajishima Konno'},
+      // 19/08/2026 — SL Itaim — 1 período
+      {id:'ag_it0819', hospId:'sl_itaim', comp:'2026-08', data:'2026-08-19',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{eda:3, cln:3, pa:3, pb:1, anRts:1},
+       obs:'4 pac · sem AP'},
+      // 19/08/2026 — LUZ — 1 período
+      {id:'ag_luz0819', hospId:'luz', comp:'2026-08', data:'2026-08-19',
+       periodos:1, brutoServico:3000, liqFinal:3000,
+       proc:{eco:3, ecoPunc:1},
+       obs:'4 pac · 3 ECOs × R$700 + 1 ECO c/ Punção × R$900 = R$3.000'},
     ],
     pacientes: [
       // ---- SL MORUMBI 02/06/2026 ----
@@ -1021,6 +1118,130 @@ function initDb() {
       
       
       
+      // ---- NIPO 01/08/2026 ----
+      {id:'p_n0801_01',nome:'Rosemeire Pereira Santiago',nasc:'1969-05-02',conv:'Bradesco Seguros',hospId:'nipo',dataAtend:'2026-08-01',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_n0801_02',nome:'Fujie Sakata',nasc:'1939-03-28',conv:'Assefaz',hospId:'nipo',dataAtend:'2026-08-01',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_n0801_03',nome:'Aline Mendonça dos Santos Silva',nasc:'1988-01-02',conv:'Postal Saúde',hospId:'nipo',dataAtend:'2026-08-01',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0801_04',nome:'Kimiyo Kamiya',nasc:'1945-02-08',conv:'HNB-A Enfermaria',hospId:'nipo',dataAtend:'2026-08-01',proc:'EDA',hist:'',ap:true,interesse:false},
+      {id:'p_n0801_05',nome:'Marisa Ferreira Kassahara Morali',nasc:'1973-07-01',conv:'Bradesco/Fleury',hospId:'nipo',dataAtend:'2026-08-01',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_n0801_06',nome:'Francisco Jean Mendes de Melo',nasc:'1991-03-13',conv:'Sul América',hospId:'nipo',dataAtend:'2026-08-01',proc:'EDA',hist:'',ap:true,interesse:false},
+      {id:'p_n0801_07',nome:'Tarcila Maria Diogo Gouvea',nasc:'1979-03-16',conv:'Bradesco Rede Personal',hospId:'nipo',dataAtend:'2026-08-01',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0801_08',nome:'Carlos Eduardo Ramos',nasc:'1966-01-03',conv:'Porto Saúde',hospId:'nipo',dataAtend:'2026-08-01',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0801_09',nome:'Yara da Silva',nasc:'1966-01-07',conv:'Sul América',hospId:'nipo',dataAtend:'2026-08-01',proc:'EDA + CLN + PB',hist:'',ap:false,interesse:false},
+      {id:'p_n0801_10',nome:'Gerson Colella',nasc:'1956-07-09',conv:'Postal Saúde',hospId:'nipo',dataAtend:'2026-08-01',proc:'EDA + PA + CLN',hist:'',ap:false,interesse:false},
+      {id:'p_n0801_11',nome:'Susana Cristina Chiquito',nasc:'1969-06-28',conv:'',hospId:'nipo',dataAtend:'2026-08-01',proc:'EDA + CLN + M + PB',hist:'',ap:true,interesse:false},
+      {id:'p_n0801_12',nome:'Lucineldes Maria da Silva',nasc:'1973-01-23',conv:'Porto Saúde',hospId:'nipo',dataAtend:'2026-08-01',proc:'CLN',hist:'',ap:false,interesse:false},
+      // ---- SL ALPHA 03/08/2026 ----
+      {id:'p_al0803_01',nome:'Procopio Gomes de Oliveira Netto',nasc:'1983-05-20',conv:'Sul América',hospId:'sl_alpha',dataAtend:'2026-08-03',proc:'EDA + PA + CLN',hist:'',ap:false,interesse:false},
+      {id:'p_al0803_02',nome:'Rogerio Hidalgo Peres',nasc:'1982-05-07',conv:'Sul América',hospId:'sl_alpha',dataAtend:'2026-08-03',proc:'EDA + CLN + M + ECO + PB + H',hist:'',ap:false,interesse:false},
+      {id:'p_al0803_03',nome:'Samoel Alexandroni Santos',nasc:'1990-03-07',conv:'Sul América',hospId:'sl_alpha',dataAtend:'2026-08-03',proc:'EDA + PA + ECO',hist:'',ap:false,interesse:false},
+      // ---- HVM 03/08/2026 ----
+      {id:'p_hvm0803_01',nome:'Beatriz Otoya Quilla',nasc:'2000-05-25',conv:'',hospId:'hvm',dataAtend:'2026-08-03',proc:'CPRE',hist:'',ap:false,interesse:false},
+      {id:'p_hvm0803_02',nome:'Lourdes Silvia Aspi Loza',nasc:'2004-01-28',conv:'',hospId:'hvm',dataAtend:'2026-08-03',proc:'CPRE',hist:'',ap:false,interesse:false},
+      {id:'p_hvm0803_03',nome:'Maria Nela Mamani Martinez',nasc:'1997-11-02',conv:'',hospId:'hvm',dataAtend:'2026-08-03',proc:'CPRE',hist:'',ap:false,interesse:false},
+      // ---- NIPO 04/08/2026 ----
+      {id:'p_n0804_01',nome:'Thiago da Silva Pereira',nasc:'2000-02-03',conv:'Notre Dame Advance',hospId:'nipo',dataAtend:'2026-08-04',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0804_02',nome:'Liliane Goncalves Nascimento',nasc:'1979-09-27',conv:'Bradesco Seguros',hospId:'nipo',dataAtend:'2026-08-04',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0804_03',nome:'Lidiane Ferreira Bonfim',nasc:'1990-01-26',conv:'Bradesco Segurado Efetivo III',hospId:'nipo',dataAtend:'2026-08-04',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_n0804_04',nome:'Macsuara de Oliveira Marcelino',nasc:'1990-04-22',conv:'Bradesco Segurado Nacional Flex',hospId:'nipo',dataAtend:'2026-08-04',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0804_05',nome:'Neide Maria de Oliveira',nasc:'1962-10-04',conv:'Sul América',hospId:'nipo',dataAtend:'2026-08-04',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_n0804_06',nome:'Marcos Augusto Ferreira',nasc:'1971-07-07',conv:'Bradesco Segurado Nacional',hospId:'nipo',dataAtend:'2026-08-04',proc:'EDA',hist:'',ap:true,interesse:false},
+      {id:'p_n0804_07',nome:'Elisangela Batista dos Santos',nasc:'1979-05-22',conv:'Postal Saúde',hospId:'nipo',dataAtend:'2026-08-04',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0804_08',nome:'Silvani de Oliveira',nasc:'1971-02-10',conv:'Bradesco Operador Saúde Top',hospId:'nipo',dataAtend:'2026-08-04',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_n0804_09',nome:'Valmir Pereira de Oliveira',nasc:'1960-07-09',conv:'Sul América',hospId:'nipo',dataAtend:'2026-08-04',proc:'EDA + PA',hist:'',ap:true,interesse:false},
+      {id:'p_n0804_10',nome:'Marcia Hiromi Ito',nasc:'1964-02-01',conv:'Sul América',hospId:'nipo',dataAtend:'2026-08-04',proc:'EDA + PA + CLN',hist:'',ap:false,interesse:false},
+      {id:'p_n0804_11',nome:'Fabiano Bernardo de Brito Araujo',nasc:'1983-02-23',conv:'Sul América',hospId:'nipo',dataAtend:'2026-08-04',proc:'EDA + CLN',hist:'',ap:false,interesse:false},
+      {id:'p_n0804_12',nome:'Silvia Pontes Figueiredo',nasc:'1981-06-17',conv:'Sul América',hospId:'nipo',dataAtend:'2026-08-04',proc:'CLN',hist:'',ap:false,interesse:false},
+      {id:'p_n0804_13',nome:'Sueli de Souza Mariano',nasc:'1982-02-04',conv:'Porto Saúde',hospId:'nipo',dataAtend:'2026-08-04',proc:'CLN',hist:'',ap:false,interesse:false},
+      {id:'p_n0804_14',nome:'Mario Massami Arai',nasc:'1965-05-21',conv:'Notre Dame Advance',hospId:'nipo',dataAtend:'2026-08-04',proc:'CLN + PB',hist:'',ap:false,interesse:false},
+      {id:'p_n0804_15',nome:'Danilo Felix Lourenco',nasc:'1971-09-12',conv:'Notre Dame Advance',hospId:'nipo',dataAtend:'2026-08-04',proc:'EDA + CLN',hist:'',ap:false,interesse:false},
+      {id:'p_n0804_16',nome:'Emerson de Lima Dias',nasc:'1972-07-16',conv:'Porto Saúde',hospId:'nipo',dataAtend:'2026-08-04',proc:'ECO',hist:'',ap:false,interesse:false},
+      // ---- SL ITAIM 05/08/2026 ----
+      {id:'p_it0805_01',nome:'Marcelo Eduardo Guiral',nasc:'1967-07-09',conv:'Sul América Especial 100',hospId:'sl_itaim',dataAtend:'2026-08-05',proc:'EDA + CLN + PB',hist:'',ap:false,interesse:false},
+      {id:'p_it0805_02',nome:'Isabela Naomi Tada Murakami',nasc:'1998-06-17',conv:'Bradesco Nacional',hospId:'sl_itaim',dataAtend:'2026-08-05',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_it0805_03',nome:'Gabriela Maciel Peron',nasc:'2004-05-05',conv:'Bradesco Nacional II',hospId:'sl_itaim',dataAtend:'2026-08-05',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_it0805_04',nome:'Caio Naday Castelo Branco',nasc:'1989-04-14',conv:'Amil One S6500 Black',hospId:'sl_itaim',dataAtend:'2026-08-05',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_it0805_05',nome:'Cirlei Cruz dos Santos',nasc:'1974-11-28',conv:'Amil H3+L3',hospId:'sl_itaim',dataAtend:'2026-08-05',proc:'EDA + PA',hist:'',ap:true,interesse:false},
+      {id:'p_it0805_06',nome:'Thamires Elen Costa Silva',nasc:'1993-05-03',conv:'Bradesco Rede Nacional',hospId:'sl_itaim',dataAtend:'2026-08-05',proc:'EDA',hist:'',ap:false,interesse:false},
+      // ---- LUZ 05/08/2026 ----
+      {id:'p_luz0805_01',nome:'Odair Rodrigues Ferreira',nasc:'1949-06-23',conv:'Amil Grupo Amil',hospId:'luz',dataAtend:'2026-08-05',proc:'ECO + Punção',hist:'',ap:false,interesse:false},
+      {id:'p_luz0805_02',nome:'Rossana Paola Pescarmona',nasc:'1966-06-05',conv:'Amil Rede 745 Medial Global',hospId:'luz',dataAtend:'2026-08-05',proc:'ECO',hist:'',ap:false,interesse:false},
+      {id:'p_luz0805_03',nome:'Nathaly Nunes Marcondes',nasc:'1996-08-29',conv:'Amil Rede 982 Fácil S60',hospId:'luz',dataAtend:'2026-08-05',proc:'ECO',hist:'',ap:false,interesse:false},
+      // ---- SL ANÁLIA 07/08/2026 ----
+      {id:'p_a0807_01',nome:'Ricardo de Souza Saraiva',nasc:'1975-08-24',conv:'Sul América Especial 100',hospId:'sl_analia',dataAtend:'2026-08-07',proc:'EDA + CLN + ECO',hist:'',ap:false,interesse:false},
+      {id:'p_a0807_02',nome:'Andre Ricardo Paulino',nasc:'1971-09-22',conv:'Sul América Especial 100',hospId:'sl_analia',dataAtend:'2026-08-07',proc:'ECO',hist:'',ap:false,interesse:false},
+      {id:'p_a0807_03',nome:'Francisca Mabel de Oliveira Oliveira',nasc:'1974-07-17',conv:'Saúde Caixa',hospId:'sl_analia',dataAtend:'2026-08-07',proc:'ECO',hist:'',ap:false,interesse:false},
+      {id:'p_a0807_04',nome:'Vanessa de Souza Melo Fernandes',nasc:'1985-02-08',conv:'Sul América Especial 100',hospId:'sl_analia',dataAtend:'2026-08-07',proc:'EDA + CLN + PB + ECO',hist:'',ap:false,interesse:false},
+      {id:'p_a0807_05',nome:'Edzon Lourenco da Silva',nasc:'1955-08-16',conv:'Sul América Especial 100',hospId:'sl_analia',dataAtend:'2026-08-07',proc:'EDA + PA + CLN + ECO',hist:'',ap:false,interesse:false},
+      {id:'p_a0807_06',nome:'Erick Ryoiti Umeki',nasc:'1993-10-17',conv:'Bradesco Rede Nacional',hospId:'sl_analia',dataAtend:'2026-08-07',proc:'EDA + ECO',hist:'',ap:false,interesse:false},
+      // ---- HVM 10/08/2026 ----
+      {id:'p_hvm0810_01',nome:'Debora Lima Fernandes',nasc:'1959-05-20',conv:'',hospId:'hvm',dataAtend:'2026-08-10',proc:'CPRE',hist:'',ap:false,interesse:false},
+      {id:'p_hvm0810_02',nome:'Zeli Silva Gomes',nasc:'1944-03-06',conv:'',hospId:'hvm',dataAtend:'2026-08-10',proc:'CPRE',hist:'',ap:false,interesse:false},
+      {id:'p_hvm0810_03',nome:'Joao Ferreira da Silva',nasc:'1958-06-15',conv:'',hospId:'hvm',dataAtend:'2026-08-10',proc:'CPRE',hist:'',ap:false,interesse:false},
+      // ---- HOSPITAL PAULISTANO 10/08/2026 (avulso/cobertura) ----
+      {id:'p_paul0810_01',nome:'Cesare Gabriel Fabbri',nasc:'2001-01-21',conv:'Amil 1352',hospId:'paulistano',dataAtend:'2026-08-10',proc:'ECO',hist:'',ap:false,interesse:false},
+      {id:'p_paul0810_02',nome:'Eudoxia Alexandre da Costa Froge',nasc:'1969-09-05',conv:'Amil 1352',hospId:'paulistano',dataAtend:'2026-08-10',proc:'ECO',hist:'',ap:false,interesse:false},
+      {id:'p_paul0810_03',nome:'Mara Cintia Sugawara de Azevedo',nasc:'1971-02-28',conv:'Amil 1352',hospId:'paulistano',dataAtend:'2026-08-10',proc:'ECO',hist:'',ap:false,interesse:false},
+      {id:'p_paul0810_04',nome:'Elena Pereira Lacerda',nasc:'1964-01-04',conv:'Amil 1352',hospId:'paulistano',dataAtend:'2026-08-10',proc:'ECO',hist:'',ap:false,interesse:false},
+      {id:'p_paul0810_05',nome:'Sylvia Maria Ribeiro Braga',nasc:'1957-07-28',conv:'Amil 1352',hospId:'paulistano',dataAtend:'2026-08-10',proc:'ECO',hist:'',ap:false,interesse:false},
+      // ---- NIPO 11/08/2026 ----
+      {id:'p_n0811_01',nome:'Patricia Antunes de Campos',nasc:'1972-03-26',conv:'Bradesco Viva 365',hospId:'nipo',dataAtend:'2026-08-11',proc:'EDA + PA',hist:'',ap:true,interesse:false},
+      {id:'p_n0811_02',nome:'Maria de Fatima Rosa de Lima Silva',nasc:'1945-07-16',conv:'Sul América Básico',hospId:'nipo',dataAtend:'2026-08-11',proc:'EDA',hist:'',ap:true,interesse:false},
+      {id:'p_n0811_03',nome:'Jose Henrique Custodio dos Santos',nasc:'1964-07-21',conv:'Notre Dame Premium',hospId:'nipo',dataAtend:'2026-08-11',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0811_04',nome:'Dhiogo Freitas Diniz',nasc:'2007-01-16',conv:'Promocional',hospId:'nipo',dataAtend:'2026-08-11',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0811_05',nome:'Thais Martins Gomes',nasc:'2000-01-26',conv:'Sul América Especial Vital',hospId:'nipo',dataAtend:'2026-08-11',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_n0811_06',nome:'Maria Cleidiana de Araujo Silva Sa',nasc:'1975-10-16',conv:'Postal Saúde',hospId:'nipo',dataAtend:'2026-08-11',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0811_07',nome:'Kleber Eustaquio da Silva',nasc:'1955-09-25',conv:'Notre Dame Advance',hospId:'nipo',dataAtend:'2026-08-11',proc:'EDA + CLN + PB + M',hist:'',ap:true,interesse:false},
+      {id:'p_n0811_08',nome:'Graciana da Cunha Figueiredo',nasc:'1980-05-26',conv:'Sul América Especial SF',hospId:'nipo',dataAtend:'2026-08-11',proc:'EDA + CLN',hist:'',ap:false,interesse:false},
+      {id:'p_n0811_09',nome:'Alexandre Silva Ferreira',nasc:'1973-10-12',conv:'Promocional',hospId:'nipo',dataAtend:'2026-08-11',proc:'EDA + PA + CLN',hist:'',ap:false,interesse:false},
+      {id:'p_n0811_10',nome:'Alexandre Borges',nasc:'1975-01-18',conv:'Notre Dame Advance',hospId:'nipo',dataAtend:'2026-08-11',proc:'CLN',hist:'',ap:false,interesse:false},
+      {id:'p_n0811_11',nome:'Lucimara Castilho de Souza',nasc:'1969-10-23',conv:'Seguros Unimed Corporativo',hospId:'nipo',dataAtend:'2026-08-11',proc:'EDA + PA + CLN + PB',hist:'',ap:false,interesse:false},
+      // ---- SL ITAIM 12/08/2026 ----
+      {id:'p_it0812_01',nome:'Maria Jose Sasso',nasc:'1955-08-12',conv:'Advance Adaptado Master',hospId:'sl_itaim',dataAtend:'2026-08-12',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_it0812_02',nome:'Gabriel Pessoa Carvalheira',nasc:'1997-01-29',conv:'Bradesco Operad. IBM Nacional Plus',hospId:'sl_itaim',dataAtend:'2026-08-12',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_it0812_03',nome:'Stephanie Appler',nasc:'1975-11-11',conv:'Sul América Especial 100',hospId:'sl_itaim',dataAtend:'2026-08-12',proc:'EDA + PA + CLN',hist:'',ap:false,interesse:false},
+      {id:'p_it0812_04',nome:'Micaela Prates de Oliveira',nasc:'1996-05-02',conv:'Bradesco Segur. Rede Nacional',hospId:'sl_itaim',dataAtend:'2026-08-12',proc:'EDA + PA + CLN + PB',hist:'',ap:false,interesse:false},
+      {id:'p_it0812_05',nome:'Maria Amelia da Silva',nasc:'1940-10-04',conv:'Sul América Especial II',hospId:'sl_itaim',dataAtend:'2026-08-12',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      // ---- LUZ 12/08/2026 ----
+      {id:'p_luz0812_01',nome:'Teofilo Alves dos Santos',nasc:'1949-01-05',conv:'Amil Grupo Amil',hospId:'luz',dataAtend:'2026-08-12',proc:'ECO',hist:'',ap:false,interesse:false},
+      {id:'p_luz0812_02',nome:'Gabriela Utempergher Ferlini',nasc:'1996-04-09',conv:'Amil Rede 1099',hospId:'luz',dataAtend:'2026-08-12',proc:'ECO',hist:'',ap:false,interesse:false},
+      {id:'p_luz0812_03',nome:'Gentil Alves dos Santos Filho',nasc:'1942-06-11',conv:'Amil',hospId:'luz',dataAtend:'2026-08-12',proc:'ECO + Punção',hist:'',ap:false,interesse:false},
+      {id:'p_luz0812_04',nome:'Ricardo Alves Ferreira',nasc:'1989-07-31',conv:'Amil Grupo Amil',hospId:'luz',dataAtend:'2026-08-12',proc:'ECO',hist:'',ap:false,interesse:false},
+      {id:'p_luz0812_05',nome:'Antonio Cesar Campanelli',nasc:'1959-06-22',conv:'Amil Rede 862',hospId:'luz',dataAtend:'2026-08-12',proc:'ECO',hist:'',ap:false,interesse:false},
+      // ---- SL ANÁLIA 14/08/2026 ----
+      {id:'p_a0814_01',nome:'Solange Rodrigues Martins Camargo dos Santos',nasc:'1961-05-12',conv:'Saúde Caixa',hospId:'sl_analia',dataAtend:'2026-08-14',proc:'EDA + PA + ECO',hist:'',ap:false,interesse:false},
+      {id:'p_a0814_02',nome:'Patricia Aparecida Alves Munhoz Tota',nasc:'1979-09-22',conv:'Porto Saúde Ouro Mais',hospId:'sl_analia',dataAtend:'2026-08-14',proc:'ECO',hist:'',ap:false,interesse:false},
+      {id:'p_a0814_03',nome:'Gabriela Pepe Marques',nasc:'2003-12-30',conv:'Sul América Especial 100',hospId:'sl_analia',dataAtend:'2026-08-14',proc:'EDA + ECO',hist:'',ap:true,interesse:false},
+      {id:'p_a0814_04',nome:'Antonio Ayslan Freire Dias',nasc:'1980-01-29',conv:'Omint/Skill Medicina Completo',hospId:'sl_analia',dataAtend:'2026-08-14',proc:'EDA + PA + CLN + ECO',hist:'',ap:false,interesse:false},
+      // ---- SL ALPHA 17/08/2026 ----
+      {id:'p_al0817_01',nome:'Gabriella Marfin Campos de Oliveira',nasc:'2004-03-26',conv:'Bradesco Segur',hospId:'sl_alpha',dataAtend:'2026-08-17',proc:'ECO',hist:'',ap:false,interesse:false},
+      {id:'p_al0817_02',nome:'Monica Fagali Andolpho',nasc:'1980-12-10',conv:'Sul América',hospId:'sl_alpha',dataAtend:'2026-08-17',proc:'CLN + PB',hist:'',ap:false,interesse:false},
+      {id:'p_al0817_03',nome:'Plinio Fernando de Godoy',nasc:'1964-12-11',conv:'Sul América',hospId:'sl_alpha',dataAtend:'2026-08-17',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_al0817_04',nome:'Marco Aurelio Marques',nasc:'1964-12-07',conv:'Sul América',hospId:'sl_alpha',dataAtend:'2026-08-17',proc:'EDA + Retossigmoidoscopia + PB + Argônio',hist:'',ap:false,interesse:false},
+      {id:'p_al0817_05',nome:'Camilla Furegato da Silva',nasc:'1981-07-10',conv:'Bradesco Segur',hospId:'sl_alpha',dataAtend:'2026-08-17',proc:'CLN',hist:'',ap:false,interesse:false},
+      // ---- HVM 17/08/2026 ----
+      {id:'p_hvm0817_01',nome:'Luis Felipe Salvador Tapia Desc',nasc:'2002-07-29',conv:'',hospId:'hvm',dataAtend:'2026-08-17',proc:'CPRE',hist:'',ap:false,interesse:false},
+      {id:'p_hvm0817_02',nome:'Jesus Barbosa Rodrigues',nasc:'1956-08-06',conv:'',hospId:'hvm',dataAtend:'2026-08-17',proc:'CPRE',hist:'',ap:false,interesse:false},
+      {id:'p_hvm0817_03',nome:'Alexandre Amaral Moreira',nasc:'1968-09-21',conv:'',hospId:'hvm',dataAtend:'2026-08-17',proc:'CPRE',hist:'',ap:false,interesse:false},
+      // ---- NIPO 18/08/2026 ----
+      {id:'p_n0818_01',nome:'Jose Roberto do Santos Ribeiro',nasc:'1971-11-11',conv:'Porto Saúde Portomed',hospId:'nipo',dataAtend:'2026-08-18',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_n0818_02',nome:'Kenjiro Iwayama',nasc:'1942-11-27',conv:'Unimed Central Nacional',hospId:'nipo',dataAtend:'2026-08-18',proc:'CLN',hist:'',ap:false,interesse:false},
+      {id:'p_n0818_03',nome:'Ednaide Guedes da Silva',nasc:'1965-07-07',conv:'Sul América 545 Exato Cummins',hospId:'nipo',dataAtend:'2026-08-18',proc:'EDA',hist:'',ap:true,interesse:false},
+      {id:'p_n0818_04',nome:'Sandra Cassia Mota de Amorim',nasc:'1978-01-23',conv:'Postal Saúde',hospId:'nipo',dataAtend:'2026-08-18',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0818_05',nome:'Jose Carlos Graciano Francisco',nasc:'1970-09-08',conv:'Seguros Unimed',hospId:'nipo',dataAtend:'2026-08-18',proc:'EDA + SNE',hist:'',ap:false,interesse:false},
+      {id:'p_n0818_06',nome:'Josivania Soares de Lima',nasc:'1977-08-09',conv:'Sul América 545 Exato Cummins',hospId:'nipo',dataAtend:'2026-08-18',proc:'EDA + CLN',hist:'',ap:true,interesse:false},
+      {id:'p_n0818_07',nome:'Kelly Regina Pereira dos Santos',nasc:'1983-12-30',conv:'Bradesco Operador Efetivo IV',hospId:'nipo',dataAtend:'2026-08-18',proc:'EDA + CLN + PB',hist:'',ap:false,interesse:false},
+      {id:'p_n0818_08',nome:'Alysson Noriyuki Kajishima Konno',nasc:'1977-11-22',conv:'Central Nacional Rede Especial',hospId:'nipo',dataAtend:'2026-08-18',proc:'EDA + PA + CLN + PB',hist:'',ap:true,interesse:false},
+      // ---- SL ITAIM 19/08/2026 ----
+      {id:'p_it0819_01',nome:'Fuad Naal',nasc:'1966-10-29',conv:'Omint/Skill Medicina Completo',hospId:'sl_itaim',dataAtend:'2026-08-19',proc:'EDA + PA + CLN',hist:'',ap:false,interesse:false},
+      {id:'p_it0819_02',nome:'Deivison Coimbra Rodrigues',nasc:'1981-06-13',conv:'Sul América Especial 100',hospId:'sl_itaim',dataAtend:'2026-08-19',proc:'CLN + PB + Anuscopia',hist:'',ap:false,interesse:false},
+      {id:'p_it0819_03',nome:'Monike Gabrielle Palazini Pereira',nasc:'1986-10-04',conv:'Bradesco Segur Nacional',hospId:'sl_itaim',dataAtend:'2026-08-19',proc:'EDA + PA + CLN',hist:'',ap:false,interesse:false},
+      {id:'p_it0819_04',nome:'Patricia Machado Ferraz',nasc:'1973-11-23',conv:'Bradesco Segur Rede Nacional',hospId:'sl_itaim',dataAtend:'2026-08-19',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      // ---- LUZ 19/08/2026 ----
+      {id:'p_luz0819_01',nome:'Gilvonaldo Ferreira dos Santos',nasc:'1974-12-24',conv:'Amil Grupo Amil',hospId:'luz',dataAtend:'2026-08-19',proc:'ECO',hist:'',ap:false,interesse:false},
+      {id:'p_luz0819_02',nome:'Michelle Bucciarelli Bassani',nasc:'1987-03-23',conv:'Amil Grupo Amil',hospId:'luz',dataAtend:'2026-08-19',proc:'ECO',hist:'',ap:false,interesse:false},
+      {id:'p_luz0819_03',nome:'Antonio Carlos dos Santos',nasc:'1947-08-05',conv:'Amil Rede 744 Medial Global',hospId:'luz',dataAtend:'2026-08-19',proc:'ECO + Punção',hist:'',ap:false,interesse:false},
+      {id:'p_luz0819_04',nome:'Fabiana Aparecida Martins de Sa',nasc:'1987-10-24',conv:'Amil Rede 610/200 Regional RM SP',hospId:'luz',dataAtend:'2026-08-19',proc:'ECO',hist:'',ap:false,interesse:false},
     ],
     pagamentos: [
       {id:'pg_nipo_04',hospId:'nipo',comp:'2026-04',data:'2026-06-25',brutoNF:4316.61,tributos:{cofins:0,pis:0,csl:0,irrf:64.75,totalTx:265.47,liquido:4051.14},glosa:706.66,liquido:4051.14,obs:'Comp abr/26 · 3 períodos · férias · glosa retroativa dez/25: R$706,66 (rep 90412)'},
@@ -1392,13 +1613,13 @@ function renderFin() {
       let pL = ags.reduce((acc, a) => acc + a.liqFinal, 0);
       let isEst = false;
       // Auto-estimate for tabelado services
-      if ((pB === 0 || pL === 0) && ['sl_analia','sl_alpha','h9j','hvm','luz'].includes(s.id)) {
+      if ((pB === 0 || pL === 0) && (['sl_analia','sl_alpha','h9j','hvm'].includes(s.id) || s.luz_logica)) {
         const brutoEst = calcBrutoEstimado(s, m);
         if (brutoEst > 0) {
           if (s.id === 'sl_alpha') {
             const desc = m >= (s.desconto_inicio||'9999') ? s.desconto_atual : s.desconto_antigo;
             pB = brutoEst; pL = r2(brutoEst * (1 - desc));
-          } else if (s.id === 'luz') {
+          } else if (s.luz_logica) {
             pB = brutoEst; pL = brutoEst;
           } else {
             const txEst = calcTributos(brutoEst, s.nf);
@@ -1678,7 +1899,7 @@ function renderDash() {
 
 function calcBrutoEstimado(s, mes) {
   // Only for tabelado/misto-tabela services: SL Anália, SL Alpha, H9J
-  if (!['sl_analia','sl_alpha','h9j','hvm','luz'].includes(s.id)) return 0;
+  if (!['sl_analia','sl_alpha','h9j','hvm'].includes(s.id) && !s.luz_logica) return 0;
   const pacs = db.pacientes.filter(p => p.hospId === s.id && p.dataAtend?.startsWith(mes));
   const ags = db.agenda.filter(a => a.hospId === s.id && a.comp === mes);
   const periodos = ags.reduce((acc,a) => acc+(a.periodos||0), 0);
@@ -1725,20 +1946,28 @@ function calcBrutoEstimado(s, mes) {
     bruto += periodos * (s.tabela.periodo || 1400);
     pacs.forEach(p => {
       const proc = p.proc || '';
+      const isColon = /\bCLN\b|Retos|RTS/i.test(proc);
       if (/\bPA\b/i.test(proc)) bruto += s.tabela.poliA || 62.5;
       if (/\bPB\b/i.test(proc)) bruto += s.tabela.poliB || 122.25;
       if (/\bM\b|Mucosect/i.test(proc)) bruto += s.tabela.mucose || 310.5;
-      if (/\bH\b/i.test(proc)) bruto += s.tabela.hemEsof || 112.5;
+      if (/\bH\b|Arg[oô]nio/i.test(proc)) bruto += isColon ? (s.tabela.hemColon||185) : (s.tabela.hemEsof||112.5);
+      if (/Retos|RTS/i.test(proc)) bruto += s.tabela.retosig || 137.5;
       if (/ECO.*Pun|Pun.*ECO/i.test(proc)) bruto += s.tabela.ecoPunc || 900;
       else if (/\bECO\b/i.test(proc)) bruto += s.tabela.eco || 750;
       if (/CPRE/i.test(proc)) bruto += s.tabela.cpreSprot || 905;
     });
     // Para Alpha: retorna bruto pré-desconto; o desconto é aplicado como "NF" no renderFin
     return r2(bruto); // bruto antes do desconto de sócio
-  } else if (s.id === 'luz') {
-    const nEco = pacs.filter(p => /\bECO\b/i.test(p.proc||'')).length;
-    const nPer = db.agenda.filter(a => a.hospId === 'luz' && a.comp === mes).reduce((a,b) => a+(b.periodos||0), 0);
-    bruto = nEco >= 3 ? nEco * 700 : nPer * 2000;
+  } else if (s.luz_logica) {
+    const pacsEco = pacs.filter(p => /\bECO\b/i.test(p.proc||''));
+    const nEco = pacsEco.length;
+    const nPer = db.agenda.filter(a => a.hospId === s.id && a.comp === mes).reduce((a,b) => a+(b.periodos||0), 0);
+    if (nEco >= 3) {
+      bruto = pacsEco.reduce((acc,p) => acc + (/Pun/i.test(p.proc||'') ? (s.tabela.ecoPunc||900) : (s.tabela.eco||700)), 0);
+    } else {
+      const nPunc = pacsEco.filter(p => /Pun/i.test(p.proc||'')).length;
+      bruto = nPer * (s.tabela.periodo||2000) + nPunc * (s.tabela.punc||200);
+    }
   }
   return r2(bruto);
 }
@@ -1872,13 +2101,13 @@ function exportExcel() {
 
     let brutoEst = 0, liqEst = 0, obs = '';
 
-    if (['sl_analia','sl_alpha','h9j','hvm','luz'].includes(s.id)) {
+    if (['sl_analia','sl_alpha','h9j','hvm'].includes(s.id) || s.luz_logica) {
       brutoEst = calcBrutoEstimado(s, mes);
       if (s.id === 'sl_alpha') {
         const desc = mes >= (s.desconto_inicio||'9999') ? s.desconto_atual : s.desconto_antigo;
         liqEst = r2(brutoEst * (1 - desc));
         obs = `Desconto sócio ${(desc*100).toFixed(0)}% — sem NF`;
-      } else if (s.id === 'luz') {
+      } else if (s.luz_logica) {
         liqEst = brutoEst;
         const nEco = pacs.filter(p => /ECO/i.test(p.proc||'')).length;
         obs = nEco >= 3 ? `${nEco} ECOs × R$700` : `${periodos} período(s) × R$2.000 (≤2 ECOs)`;
@@ -1903,13 +2132,13 @@ function exportExcel() {
   resumoRows.push([]);
   // Totals for estimable services
   const totalBruto = db.servicos
-    .filter(s => ['sl_analia','sl_alpha','h9j','hvm','luz'].includes(s.id))
+    .filter(s => ['sl_analia','sl_alpha','h9j','hvm'].includes(s.id) || s.luz_logica)
     .reduce((acc, s) => {
       if (!db.agenda.some(a => a.hospId === s.id && a.comp === mes)) return acc;
       return acc + calcBrutoEstimado(s, mes);
     }, 0);
   const totalLiq = db.servicos
-    .filter(s => ['sl_analia','sl_alpha','h9j','hvm','luz'].includes(s.id))
+    .filter(s => ['sl_analia','sl_alpha','h9j','hvm'].includes(s.id) || s.luz_logica)
     .reduce((acc, s) => {
       if (!db.agenda.some(a => a.hospId === s.id && a.comp === mes)) return acc;
       const b = calcBrutoEstimado(s, mes);
@@ -1917,7 +2146,7 @@ function exportExcel() {
         const desc = mes >= (s.desconto_inicio||'9999') ? s.desconto_atual : s.desconto_antigo;
         return acc + r2(b * (1-desc));
       }
-      if (s.id === 'luz') return acc + b;
+      if (s.luz_logica) return acc + b;
       return acc + calcTributos(b, s.nf).liquido;
     }, 0);
 
