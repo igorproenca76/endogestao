@@ -838,6 +838,61 @@ function initDb() {
        periodos:1, brutoServico:3000, liqFinal:3000,
        proc:{eco:3, ecoPunc:1},
        obs:'4 pac · 3 ECOs × R$700 + 1 ECO c/ Punção × R$900 = R$3.000'},
+      // 24/08/2026 — HVM — 1 período
+      {id:'ag_hvm0824', hospId:'hvm', comp:'2026-08', data:'2026-08-24',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{edaDiag:1, cpre:2},
+       obs:'2 pac · 2 CPRE + 1 EDA Diag · sem AP'},
+      // 25/08/2026 — NIPO — 2 períodos
+      {id:'ag_n0825', hospId:'nipo', comp:'2026-08', data:'2026-08-25',
+       periodos:2, brutoServico:0, liqFinal:0,
+       proc:{eda:12, cln:4, pxA:7, pxB:2},
+       obs:'13 pac · AP: Isabela dos Santos Lopes, Ailton do Nascimento Souza, Ludmila Miranda Brito da Silva, Nayara Marciano Mendroni'},
+      // 26/08/2026 — SL Itaim — 1 período
+      {id:'ag_it0826', hospId:'sl_itaim', comp:'2026-08', data:'2026-08-26',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{eda:4, cln:2, pa:1, pb:1},
+       obs:'4 pac · sem AP'},
+      // 26/08/2026 — LUZ — 1 período
+      {id:'ag_luz0826', hospId:'luz', comp:'2026-08', data:'2026-08-26',
+       periodos:1, brutoServico:2100, liqFinal:2100,
+       proc:{eco:3},
+       obs:'3 pac · 3 ECOs × R$700 = R$2.100'},
+      // 28/08/2026 — SL Anália — 1 período
+      {id:'ag_a0828', hospId:'sl_analia', comp:'2026-08', data:'2026-08-28',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{edaDiag:2, edaTer:2, eco:4},
+       obs:'4 pac · sem AP'},
+      // 31/08/2026 — SL Alpha — 1 período
+      {id:'ag_al0831', hospId:'sl_alpha', comp:'2026-08', data:'2026-08-31',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{eda:4, poliA:1, eco:2},
+       obs:'4 pac · sem AP'},
+      // 31/08/2026 — HVM — 1 período
+      {id:'ag_hvm0831', hospId:'hvm', comp:'2026-08', data:'2026-08-31',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{cpre:2},
+       obs:'2 pac · 2 CPRE × R$1.700 = R$3.400 bruto · sem AP'},
+      // 01/09/2026 — NIPO — 2 períodos
+      {id:'ag_n0901', hospId:'nipo', comp:'2026-09', data:'2026-09-01',
+       periodos:2, brutoServico:0, liqFinal:0,
+       proc:{eda:12, cln:6, pxA:4, pxB:1},
+       obs:'13 pac · AP: Jamile dos Santos Ribeiro, Thiago de Moraes Bezerra Silva'},
+      // 02/09/2026 — SL Itaim — 1 período
+      {id:'ag_it0902', hospId:'sl_itaim', comp:'2026-09', data:'2026-09-02',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{eda:3, cln:3, pa:2, pb:2, anRts:1},
+       obs:'5 pac · sem AP'},
+      // 02/09/2026 — LUZ — 1 período
+      {id:'ag_luz0902', hospId:'luz', comp:'2026-09', data:'2026-09-02',
+       periodos:1, brutoServico:2500, liqFinal:2500,
+       proc:{eco:1, ecoPunc:2},
+       obs:'3 pac · 2 ECOs c/ Punção × R$900 + 1 ECO × R$700 = R$2.500'},
+      // 04/09/2026 — SL Anália — 1 período
+      {id:'ag_a0904', hospId:'sl_analia', comp:'2026-09', data:'2026-09-04',
+       periodos:1, brutoServico:0, liqFinal:0,
+       proc:{edaDiag:3, clnDiag:1, eco:3},
+       obs:'3 pac · sem AP'},
     ],
     pacientes: [
       // ---- SL MORUMBI 02/06/2026 ----
@@ -1233,6 +1288,73 @@ function initDb() {
       {id:'p_hvm0817_01',nome:'Luis Felipe Salvador Tapia Desc',nasc:'2002-07-29',conv:'',hospId:'hvm',dataAtend:'2026-08-17',proc:'CPRE',hist:'',ap:false,interesse:false},
       {id:'p_hvm0817_02',nome:'Jesus Barbosa Rodrigues',nasc:'1956-08-06',conv:'',hospId:'hvm',dataAtend:'2026-08-17',proc:'CPRE',hist:'',ap:false,interesse:false},
       {id:'p_hvm0817_03',nome:'Alexandre Amaral Moreira',nasc:'1968-09-21',conv:'',hospId:'hvm',dataAtend:'2026-08-17',proc:'CPRE',hist:'',ap:false,interesse:false},
+      // ---- HVM 24/08/2026 ----
+      {id:'p_hvm0824_01',nome:'Jose Teixeira Filho',nasc:'1949-10-04',conv:'',hospId:'hvm',dataAtend:'2026-08-24',proc:'EDA + CPRE',hist:'',ap:false,interesse:false},
+      {id:'p_hvm0824_02',nome:'Flora Colque Ali',nasc:'1989-12-07',conv:'',hospId:'hvm',dataAtend:'2026-08-24',proc:'CPRE',hist:'',ap:false,interesse:false},
+      // ---- NIPO 25/08/2026 ----
+      {id:'p_n0825_01',nome:'Isabela dos Santos Lopes',nasc:'1990-03-31',conv:'Bradesco Segurado Rede Ideal',hospId:'nipo',dataAtend:'2026-08-25',proc:'EDA + PA',hist:'',ap:true,interesse:false},
+      {id:'p_n0825_02',nome:'Veronica Cavalcanti do Nascimento',nasc:'1985-05-11',conv:'Bradesco Funciona Efetivo IV',hospId:'nipo',dataAtend:'2026-08-25',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0825_03',nome:'Kyvia Borges Franzini Caramaschi',nasc:'1980-10-09',conv:'Central Nacional Rede Básica',hospId:'nipo',dataAtend:'2026-08-25',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0825_04',nome:'Flavio Tavares da Silva',nasc:'1982-01-29',conv:'Sul América 103 Especial',hospId:'nipo',dataAtend:'2026-08-25',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0825_05',nome:'Ailton do Nascimento Souza',nasc:'1975-06-15',conv:'Bradesco Operador Viva 365',hospId:'nipo',dataAtend:'2026-08-25',proc:'EDA + PA',hist:'',ap:true,interesse:false},
+      {id:'p_n0825_06',nome:'Rui Eduardo Sousa Barbosa',nasc:'1978-01-10',conv:'Notre Dame Advance SPTrans',hospId:'nipo',dataAtend:'2026-08-25',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_n0825_07',nome:'Daniel Freitas do Nascimento',nasc:'1963-10-01',conv:'Notre Dame Advance 700 Sabesp',hospId:'nipo',dataAtend:'2026-08-25',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_n0825_08',nome:'Ludmila Miranda Brito da Silva',nasc:'2002-03-03',conv:'Mediservice SL 100',hospId:'nipo',dataAtend:'2026-08-25',proc:'EDA + PA',hist:'',ap:true,interesse:false},
+      {id:'p_n0825_09',nome:'Thatiane de Almeida Costa',nasc:'1989-10-17',conv:'Postal Saúde',hospId:'nipo',dataAtend:'2026-08-25',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0825_10',nome:'Ivety Kiyomi Tanaka',nasc:'1961-03-03',conv:'Cabesp Padrão Apto',hospId:'nipo',dataAtend:'2026-08-25',proc:'EDA + PA + CLN + PB',hist:'',ap:false,interesse:false},
+      {id:'p_n0825_11',nome:'Nayara Marciano Mendroni',nasc:'1999-01-05',conv:'Sul América 545 Clássico',hospId:'nipo',dataAtend:'2026-08-25',proc:'CLN + PB',hist:'',ap:true,interesse:false},
+      {id:'p_n0825_12',nome:'Cleide Gomes Lima',nasc:'1976-09-22',conv:'Postal Saúde',hospId:'nipo',dataAtend:'2026-08-25',proc:'EDA + CLN',hist:'',ap:false,interesse:false},
+      {id:'p_n0825_13',nome:'Silvia Regina Moraes de Laet',nasc:'1969-02-08',conv:'Central Nacional Básico Intercâmbio',hospId:'nipo',dataAtend:'2026-08-25',proc:'EDA + PA + CLN',hist:'',ap:false,interesse:false},
+      // ---- SL ITAIM 26/08/2026 ----
+      {id:'p_it0826_01',nome:'Sofia Barbosa dos Santos',nasc:'1993-07-04',conv:'Bradesco Segur Rede Nacional',hospId:'sl_itaim',dataAtend:'2026-08-26',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_it0826_02',nome:'Maria Neusa Ferreira Cadinho',nasc:'1954-05-12',conv:'Sul América Especial I',hospId:'sl_itaim',dataAtend:'2026-08-26',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_it0826_03',nome:'Caroline Polato E Palmeira Zanoni',nasc:'1982-06-21',conv:'Bradesco Segur Rede Nacional',hospId:'sl_itaim',dataAtend:'2026-08-26',proc:'EDA + CLN + PB',hist:'',ap:false,interesse:false},
+      {id:'p_it0826_04',nome:'Angelica Sumaya Pinto da Silva E Ometto',nasc:'1980-02-22',conv:'Bradesco Segur Rede Nacional',hospId:'sl_itaim',dataAtend:'2026-08-26',proc:'EDA + CLN',hist:'',ap:false,interesse:false},
+      // ---- LUZ 26/08/2026 ----
+      {id:'p_luz0826_01',nome:'Fernando Morais de Oliveira',nasc:'1977-05-30',conv:'Amil Rede 1077 Empresarial Bronze',hospId:'luz',dataAtend:'2026-08-26',proc:'ECO',hist:'',ap:false,interesse:false},
+      {id:'p_luz0826_02',nome:'Vera Lucia de Sousa Andrade',nasc:'1961-04-08',conv:'Amil Rede 1029 Fácil F110',hospId:'luz',dataAtend:'2026-08-26',proc:'ECO',hist:'',ap:false,interesse:false},
+      {id:'p_luz0826_03',nome:'Cassia Augusta Costa do Nascimento',nasc:'1978-08-05',conv:'Amil Rede 886 Blue II',hospId:'luz',dataAtend:'2026-08-26',proc:'ECO',hist:'',ap:false,interesse:false},
+      // ---- SL ANÁLIA 28/08/2026 ----
+      {id:'p_a0828_01',nome:'Gregory Nicholas Philip Ribeiro da Rosa',nasc:'1988-09-10',conv:'Bradesco Segur Nacional',hospId:'sl_analia',dataAtend:'2026-08-28',proc:'EDA + ECO',hist:'',ap:false,interesse:false},
+      {id:'p_a0828_02',nome:'Lays Redua da Silva',nasc:'1994-04-28',conv:'Bradesco Segur Nacional',hospId:'sl_analia',dataAtend:'2026-08-28',proc:'EDA + PA + ECO',hist:'',ap:false,interesse:false},
+      {id:'p_a0828_03',nome:'Luiz Carlos Grilli',nasc:'1956-09-06',conv:'Sul América Estilo III Nac',hospId:'sl_analia',dataAtend:'2026-08-28',proc:'EDA + PA + ECO',hist:'',ap:false,interesse:false},
+      {id:'p_a0828_04',nome:'Silvana de Oliveira Lima',nasc:'1987-11-27',conv:'Sul América Especial 100',hospId:'sl_analia',dataAtend:'2026-08-28',proc:'EDA + ECO',hist:'',ap:false,interesse:false},
+      // ---- SL ALPHA 31/08/2026 ----
+      {id:'p_al0831_01',nome:'Lucas Sartorelli do Nascimento',nasc:'1989-10-23',conv:'Bradesco Segur',hospId:'sl_alpha',dataAtend:'2026-08-31',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_al0831_02',nome:'Victor Marques Milani',nasc:'1998-08-08',conv:'Sul América',hospId:'sl_alpha',dataAtend:'2026-08-31',proc:'EDA + ECO',hist:'',ap:false,interesse:false},
+      {id:'p_al0831_03',nome:'Bruno da Silva Santos',nasc:'1997-05-12',conv:'Sul América',hospId:'sl_alpha',dataAtend:'2026-08-31',proc:'EDA + ECO',hist:'',ap:false,interesse:false},
+      {id:'p_al0831_04',nome:'Joara da Silva Fonseca',nasc:'1994-03-11',conv:'Bradesco Segur',hospId:'sl_alpha',dataAtend:'2026-08-31',proc:'EDA',hist:'',ap:false,interesse:false},
+      // ---- HVM 31/08/2026 ----
+      {id:'p_hvm0831_01',nome:'Valdirene dos Santos Augusto',nasc:'1967-09-29',conv:'',hospId:'hvm',dataAtend:'2026-08-31',proc:'CPRE',hist:'',ap:false,interesse:false},
+      {id:'p_hvm0831_02',nome:'Aline dos Santos Brandao',nasc:'1990-08-17',conv:'',hospId:'hvm',dataAtend:'2026-08-31',proc:'CPRE',hist:'',ap:false,interesse:false},
+      // ---- NIPO 01/09/2026 ----
+      {id:'p_n0901_01',nome:'Izabelle da Silva Neves Ceu',nasc:'2004-12-26',conv:'Amil 5380/Opção 11',hospId:'nipo',dataAtend:'2026-09-01',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0901_02',nome:'Jamile dos Santos Ribeiro',nasc:'1996-05-25',conv:'Promocional',hospId:'nipo',dataAtend:'2026-09-01',proc:'EDA + PA',hist:'',ap:true,interesse:false},
+      {id:'p_n0901_03',nome:'Elisabete Severo dos Santos Corde',nasc:'1972-02-01',conv:'Notre Dame Advance',hospId:'nipo',dataAtend:'2026-09-01',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0901_04',nome:'Sandra Maria Matias de Lima',nasc:'1978-04-12',conv:'Bradesco Segurado Nacional III',hospId:'nipo',dataAtend:'2026-09-01',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0901_05',nome:'Inez de Barros Caetano',nasc:'1967-09-13',conv:'Porto Saúde Básico',hospId:'nipo',dataAtend:'2026-09-01',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0901_06',nome:'Thiago de Moraes Bezerra Silva',nasc:'1999-04-09',conv:'GEAP Família',hospId:'nipo',dataAtend:'2026-09-01',proc:'EDA',hist:'',ap:true,interesse:false},
+      {id:'p_n0901_07',nome:'Ariane Fontes de Almeida Cesar',nasc:'1990-10-31',conv:'Postal Saúde',hospId:'nipo',dataAtend:'2026-09-01',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_n0901_08',nome:'Carla Silva Vicente',nasc:'1980-02-20',conv:'Sul América 557 Especial 100',hospId:'nipo',dataAtend:'2026-09-01',proc:'EDA + PA + CLN',hist:'',ap:false,interesse:false},
+      {id:'p_n0901_09',nome:'Celia Regina de Barros Goncalves',nasc:'1956-05-08',conv:'GEAP Clássico',hospId:'nipo',dataAtend:'2026-09-01',proc:'CLN',hist:'',ap:false,interesse:false},
+      {id:'p_n0901_10',nome:'Genilson Barbosa dos Santos',nasc:'1977-07-21',conv:'Bradesco Operador Rede Personal',hospId:'nipo',dataAtend:'2026-09-01',proc:'EDA + PA + CLN',hist:'',ap:false,interesse:false},
+      {id:'p_n0901_11',nome:'Jose Domingos da Silva',nasc:'1974-04-17',conv:'Bradesco Segurado Efetivo IV',hospId:'nipo',dataAtend:'2026-09-01',proc:'EDA + PA + CLN + PB',hist:'',ap:false,interesse:false},
+      {id:'p_n0901_12',nome:'Simone Gomes da Silva Abrantes',nasc:'1979-11-05',conv:'Bradesco Segurado Scania',hospId:'nipo',dataAtend:'2026-09-01',proc:'EDA + CLN',hist:'',ap:false,interesse:false},
+      {id:'p_n0901_13',nome:'Eliane Andrade de Carvalho Maxim',nasc:'1975-06-09',conv:'Central Nacional Rede Especial',hospId:'nipo',dataAtend:'2026-09-01',proc:'EDA + CLN',hist:'',ap:false,interesse:false},
+      // ---- SL ITAIM 02/09/2026 ----
+      {id:'p_it0902_01',nome:'Simone Aparecida Gago Ratao',nasc:'1972-09-13',conv:'Sul América Especial II',hospId:'sl_itaim',dataAtend:'2026-09-02',proc:'EDA',hist:'',ap:false,interesse:false},
+      {id:'p_it0902_02',nome:'Sara Regina da Silva Vieira',nasc:'1985-05-17',conv:'Bradesco Segur Rede Nacional',hospId:'sl_itaim',dataAtend:'2026-09-02',proc:'CLN',hist:'',ap:false,interesse:false},
+      {id:'p_it0902_03',nome:'Marilia de Sampaio Leite Giudice',nasc:'1962-02-10',conv:'Sul América Mega R III',hospId:'sl_itaim',dataAtend:'2026-09-02',proc:'EDA + PA',hist:'',ap:false,interesse:false},
+      {id:'p_it0902_04',nome:'Alexandre Peral Pennini',nasc:'1962-07-03',conv:'Sul América Especial 100',hospId:'sl_itaim',dataAtend:'2026-09-02',proc:'EDA + PA + CLN + PB',hist:'',ap:false,interesse:false},
+      {id:'p_it0902_05',nome:'Meire Aparecida Pereira Marcal',nasc:'1974-04-22',conv:'Sul América Especial 100',hospId:'sl_itaim',dataAtend:'2026-09-02',proc:'CLN + PB + Anuscopia',hist:'',ap:false,interesse:false},
+      // ---- LUZ 02/09/2026 ----
+      {id:'p_luz0902_01',nome:'Jose Matos Rocha',nasc:'1959-06-21',conv:'Amil Grupo Amil',hospId:'luz',dataAtend:'2026-09-02',proc:'ECO + Punção',hist:'',ap:false,interesse:false},
+      {id:'p_luz0902_02',nome:'Georgia Kenia Costa Pereira',nasc:'1982-11-25',conv:'Amil Rede 1077 Empresarial Bronze',hospId:'luz',dataAtend:'2026-09-02',proc:'ECO + Punção',hist:'',ap:false,interesse:false},
+      {id:'p_luz0902_03',nome:'Edlene Barros Cordeiro',nasc:'1971-08-24',conv:'Amil Rede 737 Medial Essencial',hospId:'luz',dataAtend:'2026-09-02',proc:'ECO',hist:'',ap:false,interesse:false},
+      // ---- SL ANÁLIA 04/09/2026 ----
+      {id:'p_a0904_01',nome:'Giovanna Ferrarez Lima',nasc:'2004-03-04',conv:'Sul América Especial SA',hospId:'sl_analia',dataAtend:'2026-09-04',proc:'EDA + ECO',hist:'',ap:false,interesse:false},
+      {id:'p_a0904_02',nome:'Fernando Augusto Saraiva da Silva',nasc:'1981-11-20',conv:'Sul América Especial 100',hospId:'sl_analia',dataAtend:'2026-09-04',proc:'EDA + CLN + ECO',hist:'',ap:false,interesse:false},
+      {id:'p_a0904_03',nome:'Vitor Giacomazzi',nasc:'1998-11-06',conv:'Cabesp Família',hospId:'sl_analia',dataAtend:'2026-09-04',proc:'EDA + ECO',hist:'',ap:false,interesse:false},
       // ---- NIPO 18/08/2026 ----
       {id:'p_n0818_01',nome:'Jose Roberto do Santos Ribeiro',nasc:'1971-11-11',conv:'Porto Saúde Portomed',hospId:'nipo',dataAtend:'2026-08-18',proc:'EDA + PA',hist:'',ap:false,interesse:false},
       {id:'p_n0818_02',nome:'Kenjiro Iwayama',nasc:'1942-11-27',conv:'Unimed Central Nacional',hospId:'nipo',dataAtend:'2026-08-18',proc:'CLN',hist:'',ap:false,interesse:false},
