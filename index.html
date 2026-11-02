@@ -355,7 +355,7 @@ tr:hover td { background: rgba(0,0,0,0.02); }
       </div>
       <div style="display:flex;gap:20px;margin-bottom:12px;flex-wrap:wrap">
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px">
-          <input type="checkbox" id="pac-ap" style="width:auto;accent-color:var(--warn)">
+          <input type="checkbox" id="pac-ap" style="width:auto;accent-color:var(--warn)" onchange="document.getElementById('pac-apnota-wrap').style.display=this.checked?'block':'none'">
           <span style="color:var(--warn);font-weight:500">Aguarda AP</span>
           <span style="color:var(--text3);font-size:10px">(anatomopatológico — AP sublinhado na folha)</span>
         </label>
@@ -364,6 +364,7 @@ tr:hover td { background: rgba(0,0,0,0.02); }
           <span>Outro achado de interesse</span>
         </label>
       </div>
+      <div class="form-field" id="pac-apnota-wrap" style="display:none;margin-bottom:12px"><label>O que checar no AP (obrigatório)</label><input type="text" id="pac-apnota" placeholder="Ex: pólipo 12 mm sigmoide; lesão gástrica corpo; biópsia de papila"></div>
       <div class="form-actions">
         <button class="btn" onclick="hideForm('form-pac')">Cancelar</button>
         <button class="btn btn-primary" onclick="savePac()">Salvar paciente</button>
@@ -394,43 +395,44 @@ tr:hover td { background: rgba(0,0,0,0.02); }
 <div id="screen-financeiro" class="screen">
   <div class="section-header">
     <h2>Financeiro</h2>
-    <div style="display:flex;gap:8px;align-items:center">
-      <select id="f-fin-mes" onchange="renderFin()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:'DM Mono',monospace;font-size:12px;padding:6px 10px;border-radius:4px;outline:none">
-        <option value="">Todos os meses</option>
-      </select>
-      <button class="btn btn-primary" onclick="showForm('form-pgto')">+ Registrar pagamento</button>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <select id="f-fin-caixa" onchange="renderFin()" title="Filtrar pelo mês em que o dinheiro entrou" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:'DM Mono',monospace;font-size:12px;padding:6px 10px;border-radius:4px;outline:none"><option value="">Mês caixa: todos</option></select>
+      <select id="f-fin-comp" onchange="renderFin()" title="Filtrar pelo mês de trabalho" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:'DM Mono',monospace;font-size:12px;padding:6px 10px;border-radius:4px;outline:none"><option value="">Competência: todas</option></select>
+      <button class="btn btn-primary" onclick="showForm('form-rec')">+ Registrar recebimento</button>
     </div>
   </div>
-  <div id="form-pgto" style="display:none">
+  <div id="form-rec" style="display:none">
     <div class="card">
-      <div class="card-title">Registrar pagamento recebido</div>
+      <div class="card-title">Registrar valor recebido</div>
       <div class="form-grid">
-        <div class="form-field"><label>Serviço</label><select id="pg-hosp" onchange="calcPgtoPreview()"><option value="">— selecione —</option></select></div>
-        <div class="form-field"><label>Competência (mês do serviço)</label><input type="month" id="pg-comp"></div>
+        <div class="form-field"><label>Serviço</label><select id="rec-grupo"></select></div>
+        <div class="form-field"><label>Valor recebido — líquido (R$)</label><input type="number" id="rec-valor" step="0.01" placeholder="0,00"></div>
       </div>
       <div class="form-grid">
-        <div class="form-field"><label>Data do recebimento</label><input type="date" id="pg-data"></div>
-        <div class="form-field"><label>Bruto da NF emitida (R$)</label><input type="number" id="pg-bruto" step="0.01" placeholder="0,00" oninput="calcPgtoPreview()"></div>
+        <div class="form-field"><label>Mês caixa (quando o dinheiro entrou)</label><input type="month" id="rec-caixa"></div>
+        <div class="form-field"><label>Mês competência (mês do trabalho)</label><input type="month" id="rec-comp"></div>
       </div>
-      <div id="pgto-calc" style="display:none" class="calc-box"></div>
-      <div class="form-grid">
-        <div class="form-field"><label>Glosa / desconto retroativo (R$)</label><input type="number" id="pg-glosa" step="0.01" placeholder="0,00" oninput="calcPgtoPreview()"><div class="hint">Valor negativo que o hospital descontou de competências anteriores</div></div>
-        <div class="form-field"><label>Referência / NF</label><input type="text" id="pg-obs" placeholder="Ex: Repasse 90373, NF 1234"></div>
-      </div>
+      <div class="form-field" style="margin-bottom:12px"><label>Observação (opcional)</label><input type="text" id="rec-obs" placeholder="Ex: 2º repasse, retroativo"></div>
+      <div class="hint" style="margin-bottom:10px">HVM: o mês competência é o mês em que o ciclo de 21 a 20 termina (ex.: 21/set–20/out = out; o 1º pagamento acumulado, de jul a 21/out, também = out). Se a mesma competência chegou em mais de um pagamento, registre cada um separado.</div>
       <div class="form-actions">
-        <button class="btn" onclick="hideForm('form-pgto')">Cancelar</button>
-        <button class="btn btn-primary" onclick="savePgto()">Salvar pagamento</button>
+        <button class="btn" onclick="hideForm('form-rec')">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveRec()">Salvar</button>
       </div>
     </div>
   </div>
   <div class="metrics" id="fin-metrics"></div>
+  <div class="card">
+    <div class="card-title">Média recebida por período de trabalho — por serviço</div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Serviço</th><th>Pagamento</th><th>Competências recebidas</th><th>Períodos</th><th>Total recebido</th><th>Média / período (fechadas)</th><th>Média / período (todas)</th></tr></thead>
+      <tbody id="tbody-fin-resumo"></tbody>
+    </table></div>
+  </div>
   <div class="card" style="padding:0">
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Comp.</th><th>Serviço</th><th>Bruto NF</th><th>COFINS</th><th>PIS</th><th>CSL</th><th>IRRF</th><th>Glosa</th><th>Líq. final</th><th>Data pgto</th><th>Prev.</th><th>Status</th><th></th></tr></thead>
-        <tbody id="tbody-fin"></tbody>
-      </table>
-    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Competência</th><th>Serviço</th><th>Períodos</th><th>Recebido (líq.)</th><th>Média / período</th><th>Entradas (mês caixa)</th><th>Status</th></tr></thead>
+      <tbody id="tbody-fin"></tbody>
+    </table></div>
   </div>
 </div>
 
@@ -566,6 +568,7 @@ function calcBrutoTabela(s, periodos, proc, comp) {
 }
 
 function initDb() {
+  const def = defaultDb();
   try {
     const s = localStorage.getItem(KEY);
     if (s) {
@@ -574,9 +577,23 @@ function initDb() {
       ['agenda','pacientes','pagamentos'].forEach(k => {
         if (Array.isArray(parsed[k])) parsed[k] = parsed[k].filter(x => x != null);
       });
+      // Mescla: registros novos do arquivo (ids que o navegador ainda não tem) entram;
+      // o que já existe no navegador (APs conferidos, notas, edições) NÃO é sobrescrito.
+      ['agenda','pacientes','pagamentos','recebimentos'].forEach(k => {
+        if (!Array.isArray(parsed[k])) parsed[k] = [];
+        const have = new Set(parsed[k].map(x => x && x.id));
+        (def[k] || []).forEach(x => { if (x && !have.has(x.id)) parsed[k].push(x); });
+      });
+      // Notas de AP novas do arquivo preenchem pacientes ainda pendentes que não tinham nota
+      const defP = new Map((def.pacientes || []).map(x => [x.id, x]));
+      parsed.pacientes.forEach(p => { const d = defP.get(p.id); if (p && p.ap && !p.apNota && d && d.apNota) p.apNota = d.apNota; });
       return parsed;
     }
   } catch(e) {}
+  return def;
+}
+
+function defaultDb() {
   // Dados junho/2026 — validados com Igor em 08/06/2026
   return {
     servicos: SERVICOS_CONFIG,
@@ -1654,10 +1671,10 @@ function initDb() {
       {id:'p_hvm0928_02',nome:'Ana Julia Santos da Cruz',nasc:'1997-06-25',conv:'',hospId:'hvm',dataAtend:'2026-09-28',proc:'CPRE',hist:'',ap:false,interesse:false},
       {id:'p_hvm0928_03',nome:'Ariel Arua Garcia Martins',nasc:'2000-09-02',conv:'',hospId:'hvm',dataAtend:'2026-09-28',proc:'CPRE',hist:'',ap:false,interesse:false},
       // ---- NIPO 29/09/2026 ----
-      {id:'p_n0929_01',nome:'Gleisson dos Santos Pereira',nasc:'2001-08-31',conv:'Seguros Unimed Empresarial Dinâmico',hospId:'nipo',dataAtend:'2026-09-29',proc:'EDA',hist:'',ap:true,interesse:false},
+      {id:'p_n0929_01',nome:'Gleisson dos Santos Pereira',nasc:'2001-08-31',conv:'Seguros Unimed Empresarial Dinâmico',hospId:'nipo',dataAtend:'2026-09-29',proc:'EDA',hist:'',ap:false,interesse:false},
       {id:'p_n0929_02',nome:'Ana Paula Luz Ferreira do Vale Oliveira',nasc:'1983-10-18',conv:'Seguros Unimed Empresarial Básico SP',hospId:'nipo',dataAtend:'2026-09-29',proc:'EDA + PA',hist:'',ap:false,interesse:false},
       {id:'p_n0929_03',nome:'Cristiano Alves de Oliveira',nasc:'1977-11-06',conv:'Sul América 582 Master II',hospId:'nipo',dataAtend:'2026-09-29',proc:'EDA + PA',hist:'',ap:false,interesse:false},
-      {id:'p_n0929_04',nome:'Luccas Tucci Carvalho',nasc:'2004-03-04',conv:'Porto Saúde Portomed Bairros',hospId:'nipo',dataAtend:'2026-09-29',proc:'EDA + PA',hist:'',ap:true,interesse:false},
+      {id:'p_n0929_04',nome:'Luccas Tucci Carvalho',nasc:'2004-03-04',conv:'Porto Saúde Portomed Bairros',hospId:'nipo',dataAtend:'2026-09-29',proc:'EDA + PA',hist:'',ap:false,interesse:false},
       {id:'p_n0929_05',nome:'Diego Lucas de Oliveira Holanda',nasc:'1994-11-12',conv:'Notre Dame Advance 700 Sabesp II',hospId:'nipo',dataAtend:'2026-09-29',proc:'EDA + PA',hist:'',ap:false,interesse:false},
       {id:'p_n0929_06',nome:'Elisangela Aparecida Amorim',nasc:'1980-02-17',conv:'Postal Saúde Correios Saúde',hospId:'nipo',dataAtend:'2026-09-29',proc:'EDA + PA',hist:'',ap:false,interesse:false},
       {id:'p_n0929_07',nome:'Thamiris da Silva Figueredo',nasc:'1989-11-16',conv:'Bradesco Segurador Efetivo IV',hospId:'nipo',dataAtend:'2026-09-29',proc:'EDA',hist:'',ap:false,interesse:false},
@@ -1712,8 +1729,8 @@ function initDb() {
       {id:'p_n1006_05',nome:'Gerson Kiste',nasc:'1952-05-04',conv:'Notre Dame Advance 700',hospId:'nipo',dataAtend:'2026-10-06',proc:'EDA + PA',hist:'',ap:false,interesse:false},
       {id:'p_n1006_06',nome:'Paulo Guilherme Komninos',nasc:'1984-11-14',conv:'Porto Saúde Prata Mais I Q',hospId:'nipo',dataAtend:'2026-10-06',proc:'EDA',hist:'',ap:false,interesse:false},
       {id:'p_n1006_07',nome:'Josefa Tome Navarro',nasc:'1972-06-13',conv:'Bradesco Segurador Nacional III',hospId:'nipo',dataAtend:'2026-10-06',proc:'EDA',hist:'',ap:false,interesse:false},
-      {id:'p_n1006_08',nome:'Diego Moreira Lopes',nasc:'1979-03-15',conv:'Seguros Unimed PME Superior',hospId:'nipo',dataAtend:'2026-10-06',proc:'CLN + PB',hist:'',ap:true,interesse:false},
-      {id:'p_n1006_09',nome:'Midori Hamada',nasc:'1945-10-08',conv:'Sul América e BB Segurança 415 Básico',hospId:'nipo',dataAtend:'2026-10-06',proc:'EDA + CLN',hist:'',ap:true,interesse:false},
+      {id:'p_n1006_08',nome:'Diego Moreira Lopes',nasc:'1979-03-15',conv:'Seguros Unimed PME Superior',hospId:'nipo',dataAtend:'2026-10-06',proc:'CLN + PB',hist:'',ap:false,interesse:false},
+      {id:'p_n1006_09',nome:'Midori Hamada',nasc:'1945-10-08',conv:'Sul América e BB Segurança 415 Básico',hospId:'nipo',dataAtend:'2026-10-06',proc:'EDA + CLN',hist:'',ap:true,apNota:'adenoma gástrico incisura',interesse:false},
       {id:'p_n1006_10',nome:'Almir Teixeira da Fonseca',nasc:'1964-06-01',conv:'Porto Saúde Básico NC',hospId:'nipo',dataAtend:'2026-10-06',proc:'EDA + CLN',hist:'',ap:false,interesse:false},
       {id:'p_n1006_11',nome:'Regiane Fernandes',nasc:'1976-05-17',conv:'Central Nacional Unimed Rede Básica',hospId:'nipo',dataAtend:'2026-10-06',proc:'CLN + PB + H',hist:'',ap:false,interesse:false},
       {id:'p_n1006_12',nome:'Elisangela Ferraz Padilha',nasc:'1979-04-01',conv:'Porto Saúde 2 E',hospId:'nipo',dataAtend:'2026-10-06',proc:'EDA + CLN',hist:'',ap:false,interesse:false},
@@ -1757,7 +1774,7 @@ function initDb() {
       {id:'p_hvm1014_02',nome:'Juan Daniel Yana',nasc:'1994-09-23',conv:'',hospId:'hvm',dataAtend:'2026-10-14',proc:'CPRE',hist:'',ap:false,interesse:false},
       {id:'p_hvm1014_03',nome:'Edivaldo Santos dos Anjos',nasc:'1974-02-23',conv:'',hospId:'hvm',dataAtend:'2026-10-14',proc:'Duodenoscopia',hist:'Procedimento especial — R$300',ap:false,interesse:false},
       // ---- SL_ANALIA 16/10/2026 ----
-      {id:'p_a1016_01',nome:'Janaina Silvestre',nasc:'1986-08-30',conv:'Sul América Especial 100',hospId:'sl_analia',dataAtend:'2026-10-16',proc:'ECO + Punção',hist:'cisto unilocular 51,7 x 39,8 mm',ap:true,interesse:false},
+      {id:'p_a1016_01',nome:'Janaina Silvestre',nasc:'1986-08-30',conv:'Sul América Especial 100',hospId:'sl_analia',dataAtend:'2026-10-16',proc:'ECO + Punção',hist:'',ap:false,apNota:'cisto unilocular 51,7 x 39,8 mm (punção)',interesse:false},
       {id:'p_a1016_02',nome:'Aline da Silva',nasc:'1990-11-24',conv:'Sul América Especial 100',hospId:'sl_analia',dataAtend:'2026-10-16',proc:'EDA + CLN + ECO',hist:'',ap:false,interesse:false},
       {id:'p_a1016_03',nome:'Kelly Cristina Fernandes de Oliveira',nasc:'1975-02-25',conv:'Bradesco Nacional',hospId:'sl_analia',dataAtend:'2026-10-16',proc:'EDA + ECO',hist:'',ap:false,interesse:false},
       {id:'p_a1016_04',nome:'Welington da Silva Junior',nasc:'2002-02-16',conv:'Bradesco Nacional II',hospId:'sl_analia',dataAtend:'2026-10-16',proc:'EDA',hist:'',ap:false,interesse:false},
@@ -1777,7 +1794,7 @@ function initDb() {
       {id:'p_n1020_08',nome:'Flavio Miranda de Carvalho',nasc:'1978-06-19',conv:'GEAP Saúde II',hospId:'nipo',dataAtend:'2026-10-20',proc:'CLN',hist:'',ap:false,interesse:false},
       {id:'p_n1020_09',nome:'Maria Nazare de Souza Marques',nasc:'1960-11-19',conv:'Postal Saúde Correios Saúde',hospId:'nipo',dataAtend:'2026-10-20',proc:'EDA + CLN + PB + M',hist:'',ap:false,interesse:false},
       {id:'p_n1020_10',nome:'Margarida Perpetua Pereira Dias',nasc:'1968-10-11',conv:'Notre Dame Advance 700',hospId:'nipo',dataAtend:'2026-10-20',proc:'EDA + CLN',hist:'',ap:false,interesse:false},
-      {id:'p_n1020_11',nome:'Matheus Vieira Mendes',nasc:'1996-10-02',conv:'Sul América e BB Segurança 557 Especial 100',hospId:'nipo',dataAtend:'2026-10-20',proc:'CLN + PB',hist:'',ap:true,interesse:false},
+      {id:'p_n1020_11',nome:'Matheus Vieira Mendes',nasc:'1996-10-02',conv:'Sul América e BB Segurança 557 Especial 100',hospId:'nipo',dataAtend:'2026-10-20',proc:'CLN + PB',hist:'',ap:false,interesse:false},
       {id:'p_n1020_12',nome:'Jefferson Barros Bezerra',nasc:'1977-06-19',conv:'Postal Saúde Correios Saúde II',hospId:'nipo',dataAtend:'2026-10-20',proc:'EDA + CLN + PB',hist:'',ap:false,interesse:false},
       {id:'p_n1020_13',nome:'Maria de Fatima Pires dos Santos',nasc:'1966-04-17',conv:'Notre Dame Premium 900',hospId:'nipo',dataAtend:'2026-10-20',proc:'EDA + CLN + PB',hist:'',ap:false,interesse:false},
       // ---- LUZ 21/10/2026 ----
@@ -1791,7 +1808,7 @@ function initDb() {
       {id:'p_it1021_04',nome:'Maria Angela Chaves de Andrade',nasc:'1948-05-28',conv:'Advance Adaptado Remido',hospId:'sl_itaim',dataAtend:'2026-10-21',proc:'EDA',hist:'',ap:false,interesse:false},
       {id:'p_it1021_05',nome:'Edson Onofre da Silva',nasc:'1971-01-12',conv:'Sul América Especial 100',hospId:'sl_itaim',dataAtend:'2026-10-21',proc:'EDA + CLN + PB',hist:'',ap:false,interesse:false},
       {id:'p_it1021_06',nome:'Maria Angelica Fernandes Medeiros',nasc:'1953-10-18',conv:'Sul América Especial Vital',hospId:'sl_itaim',dataAtend:'2026-10-21',proc:'CLN + PB',hist:'',ap:false,interesse:false},
-      {id:'p_it1021_07',nome:'Wellington Zaccarelli Campineiro',nasc:'1965-08-20',conv:'Bradesco Rede Nacional',hospId:'sl_itaim',dataAtend:'2026-10-21',proc:'EDA + CLN + PB',hist:'',ap:true,interesse:false},
+      {id:'p_it1021_07',nome:'Wellington Zaccarelli Campineiro',nasc:'1965-08-20',conv:'Bradesco Rede Nacional',hospId:'sl_itaim',dataAtend:'2026-10-21',proc:'EDA + CLN + PB',hist:'',ap:false,interesse:false},
       // ---- HVM 23/10/2026 ----
       {id:'p_hvm1023_01',nome:'Pura Donha Pires',nasc:'1945-01-10',conv:'',hospId:'hvm',dataAtend:'2026-10-23',proc:'EDA + PA + CLN',hist:'',ap:false,interesse:false},
       {id:'p_hvm1023_02',nome:'Antenor Brito dos Santos',nasc:'1940-04-14',conv:'',hospId:'hvm',dataAtend:'2026-10-23',proc:'CLN + PB + M',hist:'',ap:false,interesse:false},
@@ -1807,6 +1824,21 @@ function initDb() {
       {id:'p_al1024_04',nome:'Sophia da Mota Tavares',nasc:'2005-11-12',conv:'Sul América',hospId:'sl_alpha',dataAtend:'2026-10-24',proc:'EDA + ECO',hist:'',ap:false,interesse:false},
       {id:'p_al1024_05',nome:'Viviane de Oliveira Santos',nasc:'1976-03-14',conv:'Care Plus',hospId:'sl_alpha',dataAtend:'2026-10-24',proc:'ECO',hist:'',ap:false,interesse:false},
       {id:'p_al1024_06',nome:'Tiago Suarez Koubo',nasc:'1988-04-06',conv:'Bradesco Segur',hospId:'sl_alpha',dataAtend:'2026-10-24',proc:'ECO',hist:'',ap:false,interesse:false},
+    ],
+    recebimentos: [
+      {id:'rc_alpha_202606_202608',grupo:'alpha',caixa:'2026-08',comp:'2026-06',valor:5400,obs:''},
+      {id:'rc_alpha_202607_202609',grupo:'alpha',caixa:'2026-09',comp:'2026-07',valor:3740,obs:''},
+      {id:'rc_alpha_202608_202610',grupo:'alpha',caixa:'2026-10',comp:'2026-08',valor:8572,obs:''},
+      {id:'rc_mi_202606_202608',grupo:'mi',caixa:'2026-08',comp:'2026-06',valor:16303,obs:''},
+      {id:'rc_mi_202607_202609',grupo:'mi',caixa:'2026-09',comp:'2026-07',valor:9167,obs:''},
+      {id:'rc_mi_202607_202610',grupo:'mi',caixa:'2026-10',comp:'2026-07',valor:2495,obs:''},
+      {id:'rc_nipo_202606_202608',grupo:'nipo',caixa:'2026-08',comp:'2026-06',valor:19770,obs:''},
+      {id:'rc_nipo_202607_202609',grupo:'nipo',caixa:'2026-09',comp:'2026-07',valor:10150,obs:''},
+      {id:'rc_nipo_202608_202610',grupo:'nipo',caixa:'2026-10',comp:'2026-08',valor:24060,obs:''},
+      {id:'rc_analia_202606_202609',grupo:'analia',caixa:'2026-09',comp:'2026-06',valor:3472,obs:''},
+      {id:'rc_analia_202607_202610',grupo:'analia',caixa:'2026-10',comp:'2026-07',valor:8600,obs:''},
+      {id:'rc_luz_202607_202609',grupo:'luz',caixa:'2026-09',comp:'2026-07',valor:4000,obs:''},
+      {id:'rc_luz_202608_202610',grupo:'luz',caixa:'2026-10',comp:'2026-08',valor:13100,obs:''},
     ],
     pagamentos: [
       {id:'pg_nipo_04',hospId:'nipo',comp:'2026-04',data:'2026-06-25',brutoNF:4316.61,tributos:{cofins:0,pis:0,csl:0,irrf:64.75,totalTx:265.47,liquido:4051.14},glosa:706.66,liquido:4051.14,obs:'Comp abr/26 · 3 períodos · férias · glosa retroativa dez/25: R$706,66 (rep 90412)'},
@@ -1990,6 +2022,9 @@ function savePac() {
   const nome = document.getElementById('pac-nome').value.trim();
   if (!nome) return alert('Informe o nome');
   const proc = buildProcString();
+  const apOn = document.getElementById('pac-ap').checked;
+  const apNota = (document.getElementById('pac-apnota').value || '').trim();
+  if (apOn && !apNota) return alert('Informe o que checar no AP');
   db.pacientes.push({
     id: uid(), nome,
     nasc: document.getElementById('pac-nasc').value,
@@ -1998,11 +2033,13 @@ function savePac() {
     dataAtend: document.getElementById('pac-data').value,
     proc,
     hist: document.getElementById('pac-hist').value,
-    ap: document.getElementById('pac-ap').checked,
+    ap: apOn,
+    apNota: apOn ? apNota : '',
     interesse: document.getElementById('pac-interesse').checked
   });
   saveDb(); hideForm('form-pac');
-  ['pac-nome','pac-nasc','pac-conv','pac-data','pac-hist'].forEach(x => document.getElementById(x).value = '');
+  ['pac-nome','pac-nasc','pac-conv','pac-data','pac-hist','pac-apnota'].forEach(x => document.getElementById(x).value = '');
+  document.getElementById('pac-apnota-wrap').style.display = 'none';
   ['pac-ap','pac-interesse','ex-eda','ex-cln','ex-eco','ex-cpre','pr-pa','pr-pb','pr-m','pr-h','pr-punc','pr-ce','pr-sne'].forEach(x => {
     const el = document.getElementById(x); if(el) el.checked = false;
   });
@@ -2072,6 +2109,43 @@ function toggleAp(id) {
   const p = db.pacientes.find(x => x.id === id); if (!p) return;
   p.ap = !p.ap; saveDb(); renderAll();
 }
+function apNotaTxt(p) {
+  const n = (p.apNota || '').trim();
+  const esc = t => String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  return n ? `<span>${esc(n)}</span>` : `<span style="color:var(--text3)">(sem nota) ${esc(p.proc||'')}</span>`;
+}
+function editApNota(id) {
+  const p = db.pacientes.find(x => x.id === id); if (!p) return;
+  const v = prompt('O que checar no AP de ' + p.nome + ':', p.apNota || '');
+  if (v === null) return;
+  p.apNota = v.trim(); saveDb(); renderAll();
+}
+let apModalId = null, apModalInteresse = null;
+function abrirAp(id) {
+  const p = db.pacientes.find(x => x.id === id); if (!p) return;
+  apModalId = id; apModalInteresse = null;
+  document.getElementById('apm-nome').textContent = p.nome + ' — ' + fmtD(p.dataAtend);
+  document.getElementById('apm-nota').innerHTML = apNotaTxt(p);
+  document.getElementById('apm-res').value = '';
+  setApInteresse(null);
+  document.getElementById('ap-modal').style.display = 'flex';
+}
+function setApInteresse(v) {
+  apModalInteresse = v;
+  document.getElementById('apm-sim').style.outline = v === true ? '2px solid var(--accent)' : 'none';
+  document.getElementById('apm-nao').style.outline = v === false ? '2px solid var(--accent)' : 'none';
+}
+function fecharAp() { document.getElementById('ap-modal').style.display = 'none'; apModalId = null; }
+function confirmarAp() {
+  const p = db.pacientes.find(x => x.id === apModalId); if (!p) return fecharAp();
+  if (apModalInteresse === null) return alert('Indique se é um caso de interesse para guardar (Sim ou Não).');
+  const res = document.getElementById('apm-res').value.trim();
+  p.ap = false;
+  p.apResultado = res;
+  if (res) p.hist = (p.hist ? p.hist + ' · ' : '') + 'AP: ' + res;
+  if (apModalInteresse) p.interesse = true;
+  saveDb(); fecharAp(); renderAll();
+}
 function delPac(id) { db.pacientes = db.pacientes.filter(p => p.id !== id); saveDb(); renderAll(); }
 
 function renderPac() {
@@ -2095,7 +2169,7 @@ function renderPac() {
   document.getElementById('tbody-pac').innerHTML = pacs.length ? pacs.map(p => {
     const s = svcById(p.hospId);
     const statusCell = p.ap
-      ? `<div><span class="badge b-ap">AP</span></div><button class="btn btn-success btn-sm" style="margin-top:4px" onclick="toggleAp('${p.id}')">AP chegou</button>`
+      ? `<div><span class="badge b-ap">AP</span></div><div style="font-size:10px;margin:3px 0;max-width:180px;cursor:pointer" title="Clique para editar" onclick="editApNota('${p.id}')">${apNotaTxt(p)} ✎</div><button class="btn btn-success btn-sm" style="margin-top:4px" onclick="abrirAp('${p.id}')">AP chegou</button>`
       : p.interesse ? `<span class="badge b-amber">Achado</span>` : '—';
     return `<tr class="${p.ap?'ap-row':''}">
       <td style="font-weight:500">${p.nome}</td>
@@ -2150,82 +2224,116 @@ function savePgto() {
 
 function delPgto(id) { if (!confirm('Remover?')) return; db.pagamentos = db.pagamentos.filter(p => p.id !== id); saveDb(); renderAll(); }
 
+const FIN_GRUPOS = [
+  {id:'alpha',  nome:'SL Alpha',          svcs:['sl_alpha'],                delay:2},
+  {id:'mi',     nome:'SL Morumbi/Itaim',  svcs:['sl_morumbi','sl_itaim'],   delay:2, variavel:true},
+  {id:'nipo',   nome:'NIPO',              svcs:['nipo'],                    delay:2, variavel:true},
+  {id:'analia', nome:'SL Anália',         svcs:['sl_analia'],               delay:3},
+  {id:'luz',    nome:'LUZ',               svcs:['luz'],                     delay:2, variavel:true},
+  {id:'hvm',    nome:'HVM',               svcs:['hvm'],                     delay:1}
+];
+const FIN_INICIO = '2026-06'; // primeira competência com agendas no sistema
+function finDelay(g, comp) { return g.id === 'mi' && comp >= '2026-07' ? 3 : g.delay; }
+// HVM: ciclos de 21 a 20, pago no mês seguinte ao fim do ciclo. 1º pagamento acumulado: jul até 21/10/2026 (ciclo "2026-10").
+function finKey(g, a) {
+  if (g.id !== 'hvm') return a.comp;
+  const d = a.data || '';
+  if (d <= '2026-10-21') return '2026-10';
+  const [y, m, dd] = d.split('-').map(Number);
+  return dd >= 21 ? addMes(y + '-' + String(m).padStart(2, '0'), 1) : d.slice(0, 7);
+}
+function finLabel(g, key) {
+  if (g.id !== 'hvm') return fmtM(key);
+  if (key === '2026-10') return 'jul → 20/out (1º pgto acumulado)';
+  return '21/' + fmtM(addMes(key, -1)).slice(0, 3) + ' → 20/' + fmtM(key).slice(0, 3);
+}
+function addMes(ym, n) { const [y,m] = ym.split('-').map(Number); const d = new Date(y, m-1+n, 1); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0'); }
+function saveRec() {
+  const grupo = document.getElementById('rec-grupo').value;
+  const valor = parseFloat(document.getElementById('rec-valor').value);
+  const caixa = document.getElementById('rec-caixa').value;
+  const comp = document.getElementById('rec-comp').value;
+  if (!grupo || !valor || !caixa || !comp) return alert('Preencha serviço, valor, mês caixa e mês competência');
+  db.recebimentos.push({ id: 'rc_' + uid(), grupo, caixa, comp, valor, obs: document.getElementById('rec-obs').value.trim() });
+  saveDb(); hideForm('form-rec');
+  ['rec-valor','rec-caixa','rec-comp','rec-obs'].forEach(x => document.getElementById(x).value = '');
+  renderAll();
+}
+function toggleFechada(grupo, comp) {
+  if (!Array.isArray(db.fechadas)) db.fechadas = [];
+  const k = grupo + '|' + comp, i = db.fechadas.indexOf(k);
+  if (i >= 0) db.fechadas.splice(i, 1); else db.fechadas.push(k);
+  saveDb(); renderAll();
+}
+function delRec(id) { if (!confirm('Remover este recebimento?')) return; db.recebimentos = db.recebimentos.filter(r => r.id !== id); saveDb(); renderAll(); }
 function renderFin() {
-  populateSel('pg-hosp');
-  // Populate month filter — include months from both agenda and pagamentos
-  const smFin = document.getElementById('f-fin-mes');
-  if (smFin) {
-    const curFin = smFin.value;
-    while (smFin.options.length > 1) smFin.remove(1);
-    const allMeses = [...new Set([
-      ...db.agenda.map(a => a.comp),
-      ...db.pagamentos.filter(p=>p&&p.comp).map(p => p.comp)
-    ])].sort().reverse();
-    allMeses.forEach(m => smFin.add(new Option(fmtM(m), m)));
-    if (curFin) smFin.value = curFin;
-  }
-  const finMesFil = document.getElementById('f-fin-mes')?.value || '';
-  const meses = [...new Set([
-    ...db.agenda.map(a => a.comp),
-    ...db.pagamentos.filter(p=>p&&p.comp).map(p => p.comp)
-  ])].filter(m => !finMesFil || m === finMesFil).sort().reverse();
+  if (!Array.isArray(db.recebimentos)) db.recebimentos = [];
+  if (!Array.isArray(db.fechadas)) db.fechadas = [];
+  const selG = document.getElementById('rec-grupo');
+  if (selG && !selG.options.length) FIN_GRUPOS.forEach(g => selG.add(new Option(g.nome, g.id)));
   const rows = [];
-  meses.forEach(m => {
-    db.servicos.forEach(s => {
-      const ags = db.agenda.filter(a => a.comp === m && a.hospId === s.id);
-      if (!ags.length) return;
-      let pB = ags.reduce((acc, a) => acc + a.brutoServico, 0);
-      let pL = ags.reduce((acc, a) => acc + a.liqFinal, 0);
-      let isEst = false;
-      // Auto-estimate for tabelado services
-      if ((pB === 0 || pL === 0) && (['sl_analia','sl_alpha','h9j','hvm'].includes(s.id) || s.luz_logica)) {
-        const brutoEst = calcBrutoEstimado(s, m);
-        if (brutoEst > 0) {
-          if (s.id === 'sl_alpha') {
-            const desc = m >= (s.desconto_inicio||'9999') ? s.desconto_atual : s.desconto_antigo;
-            pB = brutoEst; pL = r2(brutoEst * (1 - desc));
-          } else if (s.luz_logica) {
-            pB = brutoEst; pL = brutoEst;
-          } else {
-            const txEst = calcTributos(brutoEst, s.nf);
-            pB = brutoEst; pL = txEst.liquido;
-          }
-          isEst = true;
-        }
-      }
-      const pgto = db.pagamentos.find(p => p && p.comp === m && p.hospId === s.id);
-      rows.push({ comp: m, s, pB, pL, pgto, isEst });
+  FIN_GRUPOS.forEach(g => {
+    const ags = db.agenda.filter(a => g.svcs.includes(a.hospId));
+    const keys = [...new Set(ags.map(a => finKey(g, a)))].filter(k => k >= FIN_INICIO);
+    keys.forEach(c => {
+      const per = ags.filter(a => finKey(g, a) === c).reduce((t, a) => t + (a.periodos || 0), 0);
+      if (!per) return;
+      const recs = db.recebimentos.filter(r => r.grupo === g.id && r.comp === c);
+      const tot = recs.reduce((t, r) => t + r.valor, 0);
+      const fechada = tot > 0 && (!g.variavel || db.fechadas.includes(g.id + '|' + c));
+      rows.push({ c, g, per, recs, tot, fechada, prev: addMes(c, finDelay(g, c)) });
     });
   });
-  const tL = rows.reduce((s,r) => s+r.pL, 0);
-  const tR = rows.filter(r=>r.pgto).reduce((s,r) => s+r.pgto.liquido, 0);
-  const tP = rows.filter(r=>!r.pgto).reduce((s,r) => s+r.pL, 0);
-  const tEst = rows.filter(r=>r.isEst&&!r.pgto).reduce((s,r) => s+r.pL, 0);
+  rows.sort((x, y) => y.c.localeCompare(x.c) || FIN_GRUPOS.indexOf(x.g) - FIN_GRUPOS.indexOf(y.g));
+  // filtros (mês caixa = quando entrou; competência = mês de trabalho)
+  const fillSel = (id, vals, fmt) => {
+    const el = document.getElementById(id); if (!el) return '';
+    const cur = el.value;
+    while (el.options.length > 1) el.remove(1);
+    vals.forEach(v => el.add(new Option(fmt(v), v)));
+    el.value = vals.includes(cur) ? cur : '';
+    return el.value;
+  };
+  const caixas = [...new Set(db.recebimentos.map(r => r.caixa))].sort().reverse();
+  const fCaixa = fillSel('f-fin-caixa', caixas, v => 'Mês caixa: ' + fmtM(v));
+  const fComp = fillSel('f-fin-comp', [...new Set(rows.map(r => r.c))], v => 'Competência: ' + fmtM(v));
+  let entrouNoMes = null;
+  if (fCaixa) entrouNoMes = db.recebimentos.filter(r => r.caixa === fCaixa).reduce((t, r) => t + r.valor, 0);
+  for (let i = rows.length - 1; i >= 0; i--) {
+    const r = rows[i];
+    if (fComp && r.c !== fComp) rows.splice(i, 1);
+    else if (fCaixa && !r.recs.some(x => x.caixa === fCaixa)) rows.splice(i, 1);
+  }
+  // resumo por serviço (apenas competências com algum recebimento)
+  const resumo = FIN_GRUPOS.map(g => {
+    const rr = rows.filter(r => r.g.id === g.id && r.tot > 0);
+    const per = rr.reduce((t, r) => t + r.per, 0), tot = rr.reduce((t, r) => t + r.tot, 0);
+    const ff = rr.filter(r => r.fechada);
+    const perF = ff.reduce((t, r) => t + r.per, 0), totF = ff.reduce((t, r) => t + r.tot, 0);
+    return { g, n: rr.length, nF: ff.length, per, tot, media: per ? tot / per : 0, mediaF: perF ? totF / perF : 0 };
+  });
+  const tPer = resumo.reduce((t, r) => t + r.per, 0), tTot = resumo.reduce((t, r) => t + r.tot, 0);
+  const aguard = rows.filter(r => r.tot === 0).length;
   document.getElementById('fin-metrics').innerHTML = `
-    <div class="metric"><div class="metric-label">Líq. final (c/ estimados)</div><div class="metric-value">${fmtV(tL)}</div><div class="metric-sub">após tributação</div></div>
-    <div class="metric"><div class="metric-label">Recebido confirmado</div><div class="metric-value" style="color:var(--success)">${fmtV(tR)}</div></div>
-    <div class="metric"><div class="metric-label">Pendente</div><div class="metric-value" style="color:var(--warn)">${fmtV(tP)}</div><div class="metric-sub">${tEst>0?'incl. '+fmtV(tEst)+' estimado':''}</div></div>
-    <div class="metric"><div class="metric-label">% recebido</div><div class="metric-value">${tL>0?Math.round(tR/tL*100):0}%</div></div>`;
-  document.getElementById('tbody-fin').innerHTML = rows.map(r => {
-    const tx = r.pgto?.tributos || {};
-    const prev = prevPgto(r.comp, r.s.delay);
-    const status = r.pgto
-      ? `<span class="badge b-green">✓ Recebido</span>`
-      : `<span class="badge b-red">Pendente</span>`;
-    return `<tr class="${r.pgto?.glosa?'glosa-row':''}">
-      <td style="font-weight:500">${fmtM(r.comp)}<br><span class="nota" style="font-size:10px">${(()=>{const p=db.agenda.filter(a=>a.hospId===r.s.id&&a.comp===r.comp);const per=p.reduce((a,b)=>a+(b.periodos||0),0);return per?per+' per.':''})()}</span></td>
-      <td><span class="svc-dot" style="background:${r.s.cor}"></span>${r.s.nome}</td>
-      <td style="font-size:11px">${r.pgto?fmtD(r.pgto.data):fmtM(prev)}</td>
-      <td style="font-size:11px">${r.pB>0?fmtV(r.pB)+(r.isEst&&!r.pgto?' <span style="font-size:10px;color:var(--text3)">(est)</span>':''):'—'}</td>
-      <td style="font-size:11px;color:var(--danger)">${tx.cofins?fmtV(tx.cofins):'—'}</td>
-      <td style="font-size:11px;color:var(--danger)">${tx.pis?fmtV(tx.pis):'—'}</td>
-      <td style="font-size:11px;color:var(--danger)">${tx.csl?fmtV(tx.csl):'—'}</td>
-      <td style="font-size:11px;color:var(--danger)">${tx.irrf?fmtV(tx.irrf):'—'}</td>
-      <td style="font-size:11px;color:var(--danger)">${r.pgto?.glosa?`−${fmtV(r.pgto.glosa)}`:'—'}</td>
-      <td style="font-weight:500;color:${r.pL>0?'var(--success)':'var(--text3)'}">${r.pL>0?fmtV(r.pL):`<span style="color:var(--text3)">a calcular</span>`}</td>
-      <td>${status}</td>
-      <td>${r.pgto?`<button class="btn btn-danger btn-sm" onclick="delPgto('${r.pgto.id}')">✕</button>`:''}</td>
-    </tr>`  }).join('');
+    <div class="metric"><div class="metric-label">Total recebido (líq.)</div><div class="metric-value" style="color:var(--success)">${fmtV(tTot)}</div><div class="metric-sub">competências a partir de ${fmtM(FIN_INICIO)}</div></div>
+    <div class="metric"><div class="metric-label">Períodos recebidos</div><div class="metric-value">${tPer}</div></div>
+    <div class="metric"><div class="metric-label">Média geral / período</div><div class="metric-value">${fmtV(tPer ? tTot / tPer : 0)}</div></div>
+    ${entrouNoMes !== null ? `<div class="metric"><div class="metric-label">Entrou em ${fmtM(fCaixa)} (caixa)</div><div class="metric-value" style="color:var(--success)">${fmtV(entrouNoMes)}</div><div class="metric-sub">todos os serviços</div></div>` : ''}
+    <div class="metric"><div class="metric-label">Aguardando pagamento</div><div class="metric-value" style="color:var(--warn)">${aguard}</div><div class="metric-sub">serviço × competência</div></div>`;
+  document.getElementById('tbody-fin-resumo').innerHTML = resumo.map(r =>
+    `<tr><td style="font-weight:500">${r.g.nome}</td><td style="font-size:11px;color:var(--text2)">${r.g.variavel ? 'variável (pode ter parcelas)' : 'valor combinado'}</td><td>${r.n} (${r.nF} fechada${r.nF === 1 ? '' : 's'})</td><td>${r.per}</td><td>${r.tot ? fmtV(r.tot) : '—'}</td><td style="font-weight:500">${r.mediaF ? fmtV(r.mediaF) : '—'}</td><td style="color:var(--text2)">${r.media ? fmtV(r.media) : '—'}</td></tr>`).join('');
+  document.getElementById('tbody-fin').innerHTML = rows.length ? rows.map(r => {
+    const ent = r.recs.length ? r.recs.map(x => `<div style="font-size:11px">${fmtM(x.caixa)} · ${fmtV(x.valor)}${x.obs ? ' <span style="color:var(--text3)">(' + x.obs.replace(/</g,'&lt;') + ')</span>' : ''} <a href="#" onclick="delRec('${x.id}');return false" style="color:var(--danger);text-decoration:none">✕</a></div>`).join('') : '—';
+    const hoje = new Date().toISOString().slice(0, 7);
+    const atras = r.prev < hoje;
+    let st;
+    if (r.tot > 0 && r.fechada) st = r.g.variavel
+      ? `<span class="badge b-green">✓ Fechada</span> <a href="#" onclick="toggleFechada('${r.g.id}','${r.c}');return false" style="font-size:10px;color:var(--text3)">reabrir</a>`
+      : '<span class="badge b-green">✓ Recebido</span>';
+    else if (r.tot > 0) st = `<span class="badge b-amber">Parcial?</span> <a href="#" onclick="toggleFechada('${r.g.id}','${r.c}');return false" style="font-size:11px">marcar como completa</a>`;
+    else st = `<span class="badge ${atras && !r.g.variavel ? 'b-ap' : 'b-amber'}">${atras ? (r.g.variavel ? 'Aguardando (pode atrasar)' : 'Em atraso') : 'Aguardando'} · prev. ${fmtM(r.prev)}</span>`;
+    return `<tr><td style="font-weight:500">${finLabel(r.g, r.c)}</td><td>${r.g.nome}</td><td>${r.per}</td><td>${r.tot ? fmtV(r.tot) : '—'}</td><td style="font-weight:500">${r.tot ? fmtV(r.tot / r.per) : '—'}</td><td>${ent}</td><td>${st}</td></tr>`;
+  }).join('') : '<tr><td colspan="7" class="empty">Sem dados</td></tr>';
 }
 
 // ---- SERVIÇOS ----
@@ -2376,10 +2484,10 @@ function renderDash() {
         </select>
       </div>
       <table style="width:100%">
-        <thead><tr><th>Nome</th><th>Nascimento</th><th>Data</th><th>Serviço</th><th>Procedimento</th><th></th></tr></thead>
+        <thead><tr><th>Nome</th><th>Nascimento</th><th>Data</th><th>Serviço</th><th>Procedimento</th><th>Para checar</th><th></th></tr></thead>
         <tbody>${apListFiltrada.map(p => {
           const s = svcById(p.hospId);
-          return `<tr><td style="font-weight:500">${p.nome}</td><td style="font-size:11px">${p.nasc?fmtD(p.nasc):'—'}</td><td style="font-size:11px">${fmtD(p.dataAtend)}</td><td style="font-size:11px"><span class="svc-dot" style="background:${s.cor}"></span>${s.nome}</td><td style="font-size:11px">${p.proc||'—'}</td><td><button class="btn btn-success btn-sm" onclick="toggleAp('${p.id}')">AP chegou</button></td></tr>`;
+          return `<tr><td style="font-weight:500">${p.nome}</td><td style="font-size:11px">${p.nasc?fmtD(p.nasc):'—'}</td><td style="font-size:11px">${fmtD(p.dataAtend)}</td><td style="font-size:11px"><span class="svc-dot" style="background:${s.cor}"></span>${s.nome}</td><td style="font-size:11px">${p.proc||'—'}</td><td style="font-size:11px;cursor:pointer" title="Clique para editar" onclick="editApNota('${p.id}')">${apNotaTxt(p)} ✎</td><td><button class="btn btn-success btn-sm" onclick="abrirAp('${p.id}')">AP chegou</button></td></tr>`;
         }).join('')}</tbody>
       </table>
     </div>`;
@@ -2787,5 +2895,23 @@ populateSel('pg-hosp');
 populateSel('pac-hosp');
 renderAll();
 </script>
+<div id="ap-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);align-items:center;justify-content:center;z-index:999;padding:16px">
+  <div style="background:var(--bg);border:1px solid var(--border2);border-radius:8px;padding:18px;max-width:460px;width:100%">
+    <div style="font-weight:600;margin-bottom:4px">AP chegou</div>
+    <div id="apm-nome" style="font-size:12px;margin-bottom:8px"></div>
+    <div style="font-size:11px;color:var(--text2);margin-bottom:10px">Você anotou para checar: <b id="apm-nota"></b></div>
+    <label style="font-size:11px;color:var(--text2)">Resultado do AP (opcional)</label>
+    <textarea id="apm-res" rows="3" style="width:100%;margin:4px 0 12px;font-family:inherit;font-size:12px;padding:6px;border:1px solid var(--border2);border-radius:4px;background:var(--bg);color:var(--text)" placeholder="Ex: adenoma tubular com displasia de baixo grau"></textarea>
+    <div style="font-size:12px;margin-bottom:6px">Guardar como caso de interesse?</div>
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <button class="btn" id="apm-sim" onclick="setApInteresse(true)">Sim, guardar</button>
+      <button class="btn" id="apm-nao" onclick="setApInteresse(false)">Não</button>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn" onclick="fecharAp()">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmarAp()">Confirmar</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
